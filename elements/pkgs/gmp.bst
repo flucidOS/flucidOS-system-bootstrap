@@ -4,7 +4,7 @@ description: GNU Multiple Precision Arithmetic Library (needed by gcc)
 
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/gmp.tar.zst
+  url: pkgsrc:cache-core/gmp.tar.xz
 
 build-depends:
 - tools/import-fdo.bst

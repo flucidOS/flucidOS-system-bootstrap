@@ -2,7 +2,7 @@ kind: autotools
 description: ncurses library
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/ncurses.tar.zst
+  url: pkgsrc:cache-core/ncurses.tar.xz
 build-depends:
 - tools/import-fdo.bst
 variables:

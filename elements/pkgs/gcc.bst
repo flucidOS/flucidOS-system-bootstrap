@@ -6,12 +6,12 @@ description: |
 
 sources:
 - kind: tar
-  url: pkgsrc:cache-programming/gcc.tar.zst
+  url: pkgsrc:cache-programming/gcc.tar.xz
 - kind: tar
-  url: pkgsrc:cache-core/mpfr.tar.zst
+  url: pkgsrc:cache-core/mpfr.tar.xz
   directory: mpfr
 - kind: tar
-  url: pkgsrc:cache-core/mpc.tar.zst
+  url: pkgsrc:cache-core/mpc.tar.xz
   directory: mpc
 
 depends:

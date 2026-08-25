@@ -2,7 +2,7 @@ kind: manual
 description: zlib compression library
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/zlib.tar.zst
+  url: pkgsrc:cache-core/zlib.tar.xz
 build-depends:
 - tools/import-fdo.bst
 config:

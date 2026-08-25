@@ -2,7 +2,7 @@ kind: autotools
 description: GNU gettext (minimal, for build scripts)
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/gettext.tar.zst
+  url: pkgsrc:cache-core/gettext.tar.xz
 build-depends:
 - tools/import-fdo.bst
 variables:

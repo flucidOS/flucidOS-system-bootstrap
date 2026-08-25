@@ -2,7 +2,7 @@ kind: autotools
 description: GNU Awk
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/gawk.tar.zst
+  url: pkgsrc:cache-core/gawk.tar.xz
 build-depends:
 - tools/import-fdo.bst
 variables:

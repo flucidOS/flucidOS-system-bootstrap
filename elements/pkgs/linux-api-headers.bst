@@ -8,7 +8,7 @@ description: |
 
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/linux.tar.zst
+  url: pkgsrc:cache-core/linux.tar.xz
 
 build-depends:
 - tools/sysroot-setup.bst

@@ -2,7 +2,7 @@ kind: autotools
 description: GNU Autoconf
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/autoconf.tar.zst
+  url: pkgsrc:cache-core/autoconf.tar.xz
 build-depends:
 - pkgs/m4.bst
 - pkgs/perl.bst

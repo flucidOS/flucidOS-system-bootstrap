@@ -6,7 +6,7 @@ description: |
 
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/binutils.tar.zst
+  url: pkgsrc:cache-core/binutils.tar.xz
 
 build-depends:
 - pkgs/glibc.bst

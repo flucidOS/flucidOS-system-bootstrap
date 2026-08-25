@@ -2,7 +2,7 @@ kind: autotools
 description: Python 3 (minimal, for build scripts and later tooling)
 sources:
 - kind: tar
-  url: pkgsrc:cache-programming/python.tar.zst
+  url: pkgsrc:cache-programming/python.tar.xz
 build-depends:
 - tools/import-fdo.bst
 variables:

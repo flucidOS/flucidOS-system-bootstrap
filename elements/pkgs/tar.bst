@@ -2,7 +2,7 @@ kind: autotools
 description: GNU Tar
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/tar.tar.zst
+  url: pkgsrc:cache-core/tar.tar.xz
 build-depends:
 - tools/import-fdo.bst
 variables:

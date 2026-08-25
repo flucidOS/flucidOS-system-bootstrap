@@ -7,7 +7,7 @@ description: |
 
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/glibc.tar.zst
+  url: pkgsrc:cache-core/glibc.tar.xz
 
 build-depends:
 - pkgs/linux-api-headers.bst

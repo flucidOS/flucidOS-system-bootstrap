@@ -2,7 +2,7 @@ kind: manual
 description: Perl (minimal, enough for autoconf/automake)
 sources:
 - kind: tar
-  url: pkgsrc:cache-programming/perl.tar.zst
+  url: pkgsrc:cache-programming/perl.tar.xz
 build-depends:
 - tools/import-fdo.bst
 config:

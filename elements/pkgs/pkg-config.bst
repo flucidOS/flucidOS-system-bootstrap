@@ -2,7 +2,7 @@ kind: autotools
 description: pkg-config
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/pkgconf.tar.zst
+  url: pkgsrc:cache-core/pkgconf.tar.xz
 build-depends:
 - tools/import-fdo.bst
 variables:
