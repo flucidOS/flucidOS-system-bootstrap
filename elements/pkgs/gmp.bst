@@ -14,3 +14,7 @@ variables:
     --prefix=%{prefix}
     --enable-cxx
     --disable-static
+
+config:
+  configure-commands:
+  - sh ./configure %{conf-args}

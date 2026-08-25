@@ -3,7 +3,6 @@ name: FlucidOS Toolchain Bootstrap
 on:
   push:
     branches: [ "main" ]
-  # Allows you to trigger the build manually from the GitHub UI
   workflow_dispatch: 
 
 permissions:
@@ -12,7 +11,7 @@ permissions:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     
     steps:
       - name: Checkout Repository
@@ -25,30 +24,27 @@ jobs:
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
-          df -h
 
-      - name: Bypass Ubuntu 24.04 AppArmor Restrictions
+      - name: Configure Ubuntu 24.04 AppArmor for Bubblewrap
         run: |
-          echo "Disabling AppArmor unprivileged user namespace restrictions for bwrap..."
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          echo "Installing and loading the official bwrap AppArmor profile..."
+          sudo apt-get update
+          sudo apt-get install -y apparmor-profiles apparmor-utils bubblewrap
+          sudo install -m 0644 /usr/share/apparmor/extra-profiles/bwrap-userns-restrict /etc/apparmor.d/bwrap-userns-restrict
+          sudo apparmor_parser -r /etc/apparmor.d/bwrap-userns-restrict
 
       - name: Install Build Dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y lzip bubblewrap
-          # Use pipx to bypass PEP-668 strict environment rules on Ubuntu runners
+          sudo apt-get install -y lzip
           pipx install BuildStream
           pipx inject BuildStream dulwich requests buildstream-plugins
 
       - name: Compile the Toolchain
         run: |
-          # This compiles GCC, Glibc, and core utilities into /tools
-          # It relies strictly on the project.refs hashes you just pushed
           bst build all.bst
 
       - name: Export the Rootfs
         run: |
-          echo "Extracting the compiled /tools directory..."
           bst artifact checkout all.bst --directory ./bootstrap-root
 
       - name: Authenticate with GitHub Container Registry
@@ -61,11 +57,7 @@ jobs:
       - name: Build and Push OCI Image
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/flucidos-bootstrap:latest
-          # Convert the repository owner string to lowercase (Docker requirement)
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           
-          echo "Packaging /tools into a scratch OCI image..."
           tar -cC ./bootstrap-root . | docker import - $IMAGE_ID
-          
-          echo "Pushing $IMAGE_ID to GHCR..."
           docker push $IMAGE_ID
