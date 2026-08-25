@@ -27,6 +27,11 @@ jobs:
           sudo rm -rf /usr/local/share/boost
           df -h
 
+      - name: Bypass Ubuntu 24.04 AppArmor Restrictions
+        run: |
+          echo "Disabling AppArmor unprivileged user namespace restrictions for bwrap..."
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
       - name: Install Build Dependencies
         run: |
           sudo apt-get update
@@ -35,15 +40,10 @@ jobs:
           pipx install BuildStream
           pipx inject BuildStream dulwich requests buildstream-plugins
 
-      - name: Track Sources
-        run: |
-          # The cache is already hashed in project.refs, but tracking validates the tree
-          bst source track freedesktop-sdk.bst
-          bst source track --deps all all.bst
-
       - name: Compile the Toolchain
         run: |
           # This compiles GCC, Glibc, and core utilities into /tools
+          # It relies strictly on the project.refs hashes you just pushed
           bst build all.bst
 
       - name: Export the Rootfs
