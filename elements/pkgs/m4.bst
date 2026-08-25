@@ -1,9 +1,15 @@
-kind: autotools
-description: GNU m4 macro processor
+kind: manual
+description: GNU M4 macro processor
 sources:
 - kind: tar
   url: pkgsrc:cache-core/m4.tar.xz
 build-depends:
 - tools/import-fdo.bst
-variables:
-  conf-args: --prefix=%{prefix} --disable-nls
+config:
+  build-commands:
+  - |
+    mkdir -p build
+    cd build
+    ../configure --prefix=%{prefix} --disable-nls
+    make -j%{max-jobs}
+    make install DESTDIR=%{install-root}
