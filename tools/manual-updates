@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Placeholder for any package version bumps that cannot be automated.
+# Run via `just update`.
+set -euo pipefail
+echo "No manual updates required at this time."
+echo "Edit individual .bst files or re-run 'bst source track' after changing track patterns."

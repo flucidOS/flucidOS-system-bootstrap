@@ -1,0 +1,5 @@
+/result/
+/.bst/
+*.bst.stamp
+__pycache__/
+*.pyc

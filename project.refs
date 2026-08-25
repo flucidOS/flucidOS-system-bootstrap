@@ -1,0 +1,75 @@
+projects:
+  flucidOS-bootstrap:
+    pkgs/m4.bst:
+    - ref: 3ed6879bcc173e2db2f26be6ea62a8552d19101024804cb07923fe4342727343
+    pkgs/cpio.bst:
+    - ref: f5d956102bb29026f64180c966672c642c74a2045fdece845363b970338395f3
+    pkgs/bison.bst:
+    - ref: 5bbaf75e6003655ccd53726b22357f356e20f2ad2efd820f6ae334d07e20774d
+    pkgs/autoconf.bst:
+    - ref: 25689c267195e1d33ee16120e368cced31fc852dd7e454fe5ec026b7b9f1392f
+    pkgs/automake.bst:
+    - ref: 7d83f9369d8a8d0eab974be26f56d3a0439fde0313303718327470c94becadc7
+    pkgs/zlib.bst:
+    - ref: 7fdd75eefb50dd14a9e8bee0ed3cfc59514d5a363fdf2df93629d6564b5369f3
+    pkgs/flex.bst:
+    - ref: fcd89ff943d1e1a9e1e67166682e08b22f5de16784c6e08029f0f43b03f429c7
+    pkgs/file.bst:
+    - ref: ff8f5f3ba0d5c0769c2dfb8039de643648526d51a4c5f282e5862e3692624c67
+    pkgs/coreutils.bst:
+    - ref: 4dac6850a8aa38ceac380cd4746f9fbf94f28159b0654924dc28b3f5a08813db
+    pkgs/diffutils.bst:
+    - ref: ab0779f0580a8d6610d5ea800e83b0213a98d1cfc58697e5da924aa18930ec13
+    pkgs/elfutils.bst:
+    - ref: defba5633497e701b799048c1818f99e53c80c7058079b013769b981e9597be9
+    pkgs/findutils.bst:
+    - ref: 660edd89a764de00c8245781b69565f67c072d32c885ef7996b9b8c7d4c18de4
+    pkgs/binutils.bst:
+    - ref: f8dd9562076b45d7785986e0bc6296790cef3067a589b3aa9fd8e026000f46f8
+    pkgs/gmp.bst:
+    - ref: 46d6ebe7358fcdfd2d117ba265638d2f2d871dd7754d79bbc3878bcadac15cc4
+    pkgs/binutils-cross.bst:
+    - ref: f8dd9562076b45d7785986e0bc6296790cef3067a589b3aa9fd8e026000f46f8
+    pkgs/gawk.bst:
+    - ref: 326bea61629eea0b501ce4710d8e2b53887e1bafed6a23a2d0e1ebefd3b7b134
+    pkgs/perl.bst:
+    - ref: 6d3d58533380cf234cb63f2fabdc27d1bd94957a56cec7b433bcd7297856a788
+    pkgs/libtool.bst:
+    - ref: b72e139e48c1dfa367e02fba566271a0ff828e3cccdec1b1033398124bd7e4df
+    pkgs/make.bst:
+    - ref: 4cdcda1b6977ffd647912cf67890e6dd4a976823bed327eab5f902a0ed2dd49f
+    pkgs/glibc.bst:
+    - ref: 4a4ecb80420cfb46253d7aae0ea2e1413adca635fcceec2c66930ddd4f57fe47
+    pkgs/gettext.bst:
+    - ref: 0dafd5c1b02789003b7ad03e105021b4e488322067a718ea15d639f086d869b5
+    pkgs/sed.bst:
+    - ref: 7c6d8aed4bacfe441ebb0bbf8eb7ecb49ccb6f7ae94007e446e374be7f376d2c
+    pkgs/tar.bst:
+    - ref: d79770de407d4f80a46815b6a9eb44172b1bbdf5c5207ba40344e056196e1a93
+    pkgs/which.bst:
+    - ref: 0a7c8e0b56b5bf6d4c0ff1c6b1d0dc0b5600697dce77374ee2d8ad32f46e3723
+    pkgs/linux-api-headers.bst:
+    - ref: 368eef13bac7d3e2fb7b93f2269aca2a2430d4de005c122384904834cadf18d5
+    pkgs/bash.bst:
+    - ref: b82e1cd37c0d8101c2c844b771b175de02e7140c797e976a071507fc9c1c2803
+    pkgs/grep.bst:
+    - ref: 788a029018e39466719fde22b85bf7e29a5460c08ef33eb6c65a449d83241453
+    pkgs/gzip.bst:
+    - ref: 2502ebef13f704ebad94c3793be7c4422156052e826026514344349d21cc5f9b
+    pkgs/ncurses.bst:
+    - ref: 1ce288eb436a2bdfc050f9b9832a6a45df0802204c1a439c107dac6439e0ca3b
+    pkgs/pkg-config.bst:
+    - ref: edc78b8164cc201143cab429883a543cb599264373de08bb197ca59940e7000e
+    pkgs/python.bst:
+    - ref: 5b6e9888ab71c59348b05a11fa97e8e8b2331dd70d5ac8a5cc1742e31ead029e
+    pkgs/xz.bst:
+    - ref: fbd86e48eb87847b8533c32a766cd1a805973b21663353cbdcc9203efc391c03
+    pkgs/gcc.bst:
+    - ref: 17fbaedae5fde6c9e5a6dc9bcef66d992bda351723a4e25441315b95c5b16dda
+    - ref: cafed798006c410ca4e32cd0badc2a79ecdeece11a5cd6c711397c4f794caad0
+    - ref: 0470a15a3103f1ffc9f5ebd4894f840b7fe50f4608fd5235495e63a429eedef4
+    pkgs/gcc-cross.bst:
+    - ref: 17fbaedae5fde6c9e5a6dc9bcef66d992bda351723a4e25441315b95c5b16dda
+    - ref: cafed798006c410ca4e32cd0badc2a79ecdeece11a5cd6c711397c4f794caad0
+    - ref: 0470a15a3103f1ffc9f5ebd4894f840b7fe50f4608fd5235495e63a429eedef4
+    - ref: 46d6ebe7358fcdfd2d117ba265638d2f2d871dd7754d79bbc3878bcadac15cc4
