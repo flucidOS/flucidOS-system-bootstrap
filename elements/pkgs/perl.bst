@@ -7,6 +7,6 @@ build-depends:
 - tools/import-fdo.bst
 config:
   build-commands:
-  - ./Configure -des -Dprefix=%{prefix} -Dusethreads -Dusedevel
+  - ./Configure -des -Dprefix=%{prefix} -Dusethreads -Dusedevel -Dusedevel
   - make -j%{max-jobs}
   - make install DESTDIR=%{install-root}
