@@ -7,7 +7,4 @@ build-depends:
 - tools/import-fdo.bst
 config:
   build-commands:
-  - chmod +x configure
-  - ./configure --prefix=%{prefix} --disable-nls
-  - make -j%{max-jobs}
-  - make install DESTDIR=%{install-root}
+  - cd %{conf-root} && chmod +x configure && ./configure --prefix=%{prefix} --disable-nls && make -j%{max-jobs} && make install DESTDIR=%{install-root}
