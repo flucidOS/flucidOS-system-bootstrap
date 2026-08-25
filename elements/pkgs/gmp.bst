@@ -17,4 +17,7 @@ variables:
 
 config:
   configure-commands:
-  - sh ./configure %{conf-args}
+  - |
+    mkdir -p "%{build-dir}"
+    cd "%{build-dir}"
+    sh "%{conf-root}/configure" %{conf-args}

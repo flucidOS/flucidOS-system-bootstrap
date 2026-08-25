@@ -1,0 +1,73 @@
+diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
+index b4894d4..7f364e4 100644
+--- a/.github/workflows/build.yml
++++ b/.github/workflows/build.yml
+@@ -27,11 +27,40 @@ jobs:
+ 
+       - name: Configure Ubuntu 24.04 AppArmor for Bubblewrap
+         run: |
+-          echo "Installing and loading the official bwrap AppArmor profile..."
++          echo "Installing and loading the bwrap AppArmor profile..."
+           sudo apt-get update
+           sudo apt-get install -y apparmor-profiles apparmor-utils bubblewrap
+-          sudo install -m 0644 /usr/share/apparmor/extra-profiles/bwrap-userns-restrict /etc/apparmor.d/bwrap-userns-restrict
+-          sudo apparmor_parser -r /etc/apparmor.d/bwrap-userns-restrict
++          # NOTE: bwrap-userns-restrict permits bwrap itself to unshare(CLONE_NEWUSER)
++          # but explicitly blocks anything bwrap launches from creating further
++          # namespaces (e.g. the netns bwrap sets up for build hermeticity, or any
++          # nested sandboxing BuildStream/the toolchain triggers). That's what was
++          # still breaking the toolchain build. bwrap-userns is the documented,
++          # less-restrictive fallback profile that allows both.
++          if [ -f /usr/share/apparmor/extra-profiles/bwrap-userns ]; then
++            sudo install -m 0644 /usr/share/apparmor/extra-profiles/bwrap-userns /etc/apparmor.d/bwrap-userns
++            sudo apparmor_parser -r /etc/apparmor.d/bwrap-userns
++          else
++            # Fallback for runner images where the packaged profile has moved/been
++            # rolled back: write an equivalent unconfined+userns profile directly.
++            sudo tee /etc/apparmor.d/bwrap >/dev/null <<'PROFILE'
++          abi <abi/4.0>,
++          include <tunables/global>
++
++          profile bwrap /usr/bin/bwrap flags=(unconfined) {
++            userns,
++            include if exists <local/bwrap>
++          }
++          PROFILE
++            sudo apparmor_parser -r /etc/apparmor.d/bwrap
++          fi
++
++      - name: Smoke-test bwrap sandboxing
++        run: |
++          # Fail fast (seconds) instead of ~4 minutes into `bst build` with a
++          # cryptic "C compiler cannot create executables" buried in a package log.
++          bwrap --unshare-user --unshare-net --uid 0 --gid 0 \
++            --ro-bind / / --dev /dev --proc /proc \
++            /bin/sh -c 'echo bwrap sandbox OK'
+ 
+       - name: Install Build Dependencies
+         run: |
+diff --git a/elements/pkgs/gmp.bst b/elements/pkgs/gmp.bst
+index bc7cc0d..270e40c 100644
+--- a/elements/pkgs/gmp.bst
++++ b/elements/pkgs/gmp.bst
+@@ -17,4 +17,7 @@ variables:
+ 
+ config:
+   configure-commands:
+-  - sh ./configure %{conf-args}
++  - |
++    mkdir -p "%{build-dir}"
++    cd "%{build-dir}"
++    sh "%{conf-root}/configure" %{conf-args}
+diff --git a/elements/pkgs/perl.bst b/elements/pkgs/perl.bst
+index 54898ac..ad87920 100644
+--- a/elements/pkgs/perl.bst
++++ b/elements/pkgs/perl.bst
+@@ -7,6 +7,6 @@ build-depends:
+ - tools/import-fdo.bst
+ config:
+   build-commands:
+-  - ./Configure -des -Dprefix=%{prefix} -Dusethreads -Dusedevel -Dusedevel
++  - ./Configure -des -Dprefix=%{prefix} -Dusethreads -Dusedevel
+   - make -j%{max-jobs}
+   - make install DESTDIR=%{install-root}
