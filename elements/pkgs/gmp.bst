@@ -1,14 +1,9 @@
-kind: manual
+kind: autotools
 description: GNU Multiple Precision Arithmetic Library
 sources:
 - kind: tar
   url: pkgsrc:cache-core/gmp.tar.xz
 build-depends:
 - tools/import-fdo.bst
-config:
-  build-commands:
-  - |
-    cd */
-    ./configure --prefix=%{prefix} --enable-cxx --disable-static
-    make -j%{max-jobs}
-    make install DESTDIR=%{install-root}
+variables:
+  conf-args: --prefix=%{prefix} --enable-cxx --disable-static
