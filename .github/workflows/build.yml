@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     
     steps:
       - name: Checkout Repository
@@ -23,11 +23,6 @@ jobs:
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
-
-      - name: Configure Ubuntu 24.04 AppArmor for BuildStream
-        run: |
-          echo "Bypassing unprivileged userns restrictions globally for nested GCC execution..."
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Install Build Dependencies
         run: |
