@@ -9,7 +9,7 @@ projects:
     pkgs/autoconf.bst:
     - ref: 8ffd1e8d59de1309f1cbfebe84fcafcf662072c0be4030ac1dd2355ab3052fb5
     pkgs/automake.bst:
-    - ref: 77994a012529d79a9b8a47bde223e03a08ec11773f0c3d0fe45d48884c28b0bd
+    - ref: 53768f769f9807c93c1b65aba4fd4c7dbcd4c11b0627ee683e5f656669107540
     pkgs/zlib.bst:
     - ref: a79e2061f7c59e6d8526a5e407f417d8104c45e7659f517cf7828bd550bed18e
     pkgs/flex.bst:
@@ -59,7 +59,7 @@ projects:
     pkgs/ncurses.bst:
     - ref: 66feccac734894cbff03a8dd85e99a022d70acf0c30fd5467895db9bc6893ef2
     pkgs/pkg-config.bst:
-    - ref: b47b55d4d2396cc44c19326285f735563ec1233cee5131edf1ae9d909bf1310f
+    - ref: 9583e6b27a5b782fb4f151875ba8347b18ed74030030c4d16adcbf6ad00dbfd0
     pkgs/python.bst:
     - ref: 111ad51ec7211d6c69f97e708331557d98105554acddb4d629a516bbad7aa47c
     pkgs/xz.bst:
