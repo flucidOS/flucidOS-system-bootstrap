@@ -6,7 +6,7 @@ description: |
 
 sources:
 - kind: tar
-  url: github:flucidOS/pkg-src/releases/download/cache-core/binutils.tar.xz
+  url: pkgsrc:cache-core/binutils.tar.xz
   # ref: must exist in project.refs (track if missing)
 
 build-depends:
