@@ -1,33 +1,33 @@
 projects:
   flucidOS-bootstrap:
     pkgs/m4.bst:
-    - ref: 6bf02eb2741d29221a797698e0c08d43dc180d21e61ea1e4e5e8dd9393182ec0
+    - ref: 2a7f4960eec7d896dd553ea4bdcca2dc585015a78c95bb5b43a8b3cfec6a5d75
     pkgs/cpio.bst:
-    - ref: f005809ec9fb99d01490073aea8e0b2ae76d78457c6911417f2bc66a57e0e441
+    - ref: 544b80bb5e929b3a6067c32b080cda281e67eaa0e414e10902ab62dd561257c8
     pkgs/bison.bst:
-    - ref: c1c3b7ef676ce049c37e07beefda377d7fbd21843ffdd8c973e2288a2c0f52a8
+    - ref: c2181f217397d90df70677490e448fbfe890a2846ab6fce1252dc589480c1a6d
     pkgs/autoconf.bst:
-    - ref: f5d48423727c51ec974c4bec1730a95fd9271d0971db3c50dfaca5c2d69707f9
+    - ref: 8ffd1e8d59de1309f1cbfebe84fcafcf662072c0be4030ac1dd2355ab3052fb5
     pkgs/automake.bst:
-    - ref: 28b34ae0dc805bd77c53056234b2d706d3a9977ceb446cc0a65e669f9e616436
+    - ref: 77994a012529d79a9b8a47bde223e03a08ec11773f0c3d0fe45d48884c28b0bd
     pkgs/zlib.bst:
     - ref: a79e2061f7c59e6d8526a5e407f417d8104c45e7659f517cf7828bd550bed18e
     pkgs/flex.bst:
-    - ref: 0d04c82abdaa3559c65a1fd58932b2f5538f9dee782a00ec3a2e88ccdf8e80ae
+    - ref: a5ca329163e8b2cb814c2f50818e49898931f8bfcc42dcd03dd4ca85f297b964
     pkgs/file.bst:
-    - ref: 330c8d04d9f0c7f921d69328c28fc965670731144b042e72e9194224f20533c0
+    - ref: 08e3c5a264af3b93371b06a1fa7e96698c3048b6ac6e362fb855d9ccac5fa8be
     pkgs/coreutils.bst:
-    - ref: e7473439c30772a7569fbc3276cd136555fcdbf85c02f071aed29c0a548cca1c
+    - ref: fc638535fb6afb4fa75c6a8b09d812ef1a478345bb05c9858356f9d5782902a3
     pkgs/diffutils.bst:
-    - ref: 6f7967374e254ad548877e0376904fc0c03c251eecde6498bbb1efe579d3a1a6
+    - ref: 9b7d1c99d0209428aa91cdcd0cdfc64fbb3bf640e7a71fa327df3b1d32e447b2
     pkgs/elfutils.bst:
-    - ref: f237500e4b5ada5ef7572083a3b63fd3dd032e5cb8e035da8222edb315d2124a
+    - ref: 17025c76fa947ba173f5fcd3fff97c5b4826882de2935a6febd12feda9dd2b42
     pkgs/findutils.bst:
-    - ref: ce065ba2a13859bdf3892ca6befb72cbf3089013f5fb254a4029d049f73ef588
+    - ref: 85a7919c3a327777fe7f540cab9a4803da703dbea90a62217eedc5ab5105eab3
     pkgs/binutils.bst:
     - ref: eeddc2fbd3f9d3af7ce7f93039bce24d467770f5f701ba85810a1fecb29bfca1
     pkgs/gmp.bst:
-    - ref: c0841686ff347e448f73ae7b1a54926cb427f8ae083f9092d0ef16b55e8d7769
+    - ref: 129bc1ab06d123098cfc2dc805d66f411f4fac0cd33da81ea5805d00b8f4e8d0
     pkgs/binutils-cross.bst:
     - ref: eeddc2fbd3f9d3af7ce7f93039bce24d467770f5f701ba85810a1fecb29bfca1
     pkgs/gawk.bst:
@@ -53,11 +53,11 @@ projects:
     pkgs/bash.bst:
     - ref: 424c64aaf2cefac37ac66250c0d9354ad06ca3ae1e55a2cd80dd03ce69ad959e
     pkgs/grep.bst:
-    - ref: 5e7d7f28f3d14e2d78c85fede76a8d7d95ae62be950cb1f54077e30ffc52cab0
+    - ref: fff09f8c782602ec7764b8f054d06b7da2c1bc58fe7f9782b20c516538034401
     pkgs/gzip.bst:
-    - ref: 484e69e9cbee980708d4b9b787526de48b4a6a97dff60a4b9e913b9041539432
+    - ref: 36cdf62a072f267ec03ab76aa63abd9564d37e950f3e501242c21ff43e5913fe
     pkgs/ncurses.bst:
-    - ref: 6c2f23d56df05df089d0d011f0ea61cde41869f283df09f196331d7b8d9961f2
+    - ref: 66feccac734894cbff03a8dd85e99a022d70acf0c30fd5467895db9bc6893ef2
     pkgs/pkg-config.bst:
     - ref: b47b55d4d2396cc44c19326285f735563ec1233cee5131edf1ae9d909bf1310f
     pkgs/python.bst:
