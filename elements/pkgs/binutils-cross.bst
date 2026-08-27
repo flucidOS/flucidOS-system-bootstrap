@@ -1,20 +1,30 @@
 kind: autotools
-description: First stage cross binutils
+
+description: |
+  Cross binutils. First stage — host gcc comes only from import-fdo
+  (bootstrap-import). Do not depend on toolchain.bst.
 
 sources:
-- kind: tar
-  url: pkgsrc:cache-core/binutils.tar.xz
+- kind: gnu
+  name: binutils
+# or your pkg-src tar + ref (same as you already track)
 
 build-depends:
-- freedesktop-sdk.bst:components/texinfo.bst
 - tools/import-fdo.bst
 
 variables:
-  conf-args: >-
-    --prefix=%{prefix}
+  build-dir: build
+  conf-local: >-
     --target=%{bootstrap-triplet}
     --with-sysroot=%{bootstrap-sysroot}
     --with-lib-path=%{libdir}
     --disable-nls
     --disable-werror
     --disable-plugins
+
+config:
+  install-commands:
+    (>):
+    - ln -sv lib %{install-root}%{prefix}/lib64
+    - rm -rf %{install-root}%{datadir}/info
+    - rm -rf %{install-root}%{libdir}/bfd-plugins

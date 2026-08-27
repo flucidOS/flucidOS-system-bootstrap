@@ -1,9 +1,16 @@
 kind: autotools
-description: GNU M4 macro processor
+
+description: |
+  GNU m4. Only after tools/toolchain.bst. Skip failing doc/check targets.
+
 sources:
-- kind: tar
-  url: pkgsrc:cache-core/m4.tar.xz
+- kind: gnu
+  name: m4
+# or your tar + ref
+
 build-depends:
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: --prefix=%{prefix} --disable-nls
+  conf-local: --disable-gcc-warnings
+  make-args: -j%{max-jobs} MAKEINFO=true HELP2MAN=true
