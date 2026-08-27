@@ -1,14 +1,24 @@
 kind: autotools
-description: GNU M4 macro processor
+description: GNU Multiple Precision Arithmetic Library (cross-compiled)
 
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/m4.tar.xz
+  url: pkgsrc:cache-core/gmp.tar.xz
 
 build-depends:
-- tools/toolchain.bst  # <--- THIS IS THE FIX. Do NOT use import-fdo.bst here.
+- pkgs/gcc-cross.bst
+- pkgs/binutils-cross.bst
+- pkgs/glibc.bst
+- pkgs/linux-api-headers.bst
+- tools/import-fdo.bst
+- tools/sysroot-setup.bst
 
 variables:
   conf-args: >-
     --prefix=%{prefix}
-    --disable-nls
+    --host=%{bootstrap-triplet}
+    --enable-cxx
+    --disable-static
+environment:
+  CC: "%{bootstrap-triplet}-gcc"
+  CXX: "%{bootstrap-triplet}-g++"

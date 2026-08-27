@@ -1,8 +1,5 @@
 kind: autotools
-
-description: |
-  Final GCC (C/C++) that will be used by the rest of the FlucidOS
-  image pipeline. Built after glibc and the final binutils exist.
+description: Final GCC (native)
 
 sources:
 - kind: tar
@@ -18,9 +15,11 @@ depends:
 - pkgs/gmp.bst
 
 build-depends:
-- pkgs/glibc.bst
+- pkgs/libstdcxx.bst
 - pkgs/binutils.bst
+- pkgs/glibc.bst
 - pkgs/linux-api-headers.bst
+- tools/import-fdo.bst
 - tools/sysroot-setup.bst
 
 variables:
