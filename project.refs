@@ -9,7 +9,7 @@ projects:
     pkgs/autoconf.bst:
     - ref: 8ffd1e8d59de1309f1cbfebe84fcafcf662072c0be4030ac1dd2355ab3052fb5
     pkgs/automake.bst:
-    - ref: 77994a012529d79a9b8a47bde223e03a08ec11773f0c3d0fe45d48884c28b0bd
+    - ref: 53768f769f9807c93c1b65aba4fd4c7dbcd4c11b0627ee683e5f656669107540
     pkgs/zlib.bst:
     - ref: a79e2061f7c59e6d8526a5e407f417d8104c45e7659f517cf7828bd550bed18e
     pkgs/flex.bst:
