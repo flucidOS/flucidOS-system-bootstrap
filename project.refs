@@ -1,7 +1,7 @@
 projects:
   flucidOS-bootstrap:
     pkgs/m4.bst:
-    - ref: 2a7f4960eec7d896dd553ea4bdcca2dc585015a78c95bb5b43a8b3cfec6a5d75
+    - ref: f218f1a44a403c1f9bb47b9c84c2a4a6ea1b023c25d6e6c6ceeb2d4a30cf96f2
     pkgs/cpio.bst:
     - ref: 544b80bb5e929b3a6067c32b080cda281e67eaa0e414e10902ab62dd561257c8
     pkgs/bison.bst:
