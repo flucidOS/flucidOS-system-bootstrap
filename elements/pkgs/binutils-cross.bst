@@ -5,9 +5,9 @@ description: |
   (bootstrap-import). Do not depend on toolchain.bst.
 
 sources:
-- kind: gnu
-  name: binutils
-# or your pkg-src tar + ref (same as you already track)
+- kind: tar
+  url: https://github.com/flucidOS/pkg-src/releases/download/cache-core/binutils.tar.xz
+  ref: eeddc2fbd3f9d3af7ce7f93039bce24d467770f5f701ba85810a1fecb29bfca1
 
 build-depends:
 - tools/import-fdo.bst
