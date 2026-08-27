@@ -9,7 +9,7 @@ projects:
     pkgs/autoconf.bst:
     - ref: 8ffd1e8d59de1309f1cbfebe84fcafcf662072c0be4030ac1dd2355ab3052fb5
     pkgs/automake.bst:
-    - ref: 77994a012529d79a9b8a47bde223e03a08ec11773f0c3d0fe45d48884c28b0bd
+    - ref: 53768f769f9807c93c1b65aba4fd4c7dbcd4c11b0627ee683e5f656669107540
     pkgs/zlib.bst:
     - ref: a79e2061f7c59e6d8526a5e407f417d8104c45e7659f517cf7828bd550bed18e
     pkgs/flex.bst:
@@ -37,7 +37,7 @@ projects:
     pkgs/libtool.bst:
     - ref: 329ca96dec436bce624c32928bbd0729fee81a38f60cd3a0b4ca5af384833d8f
     pkgs/make.bst:
-    - ref: 77994a012529d79a9b8a47bde223e03a08ec11773f0c3d0fe45d48884c28b0bd
+    - ref: 53768f769f9807c93c1b65aba4fd4c7dbcd4c11b0627ee683e5f656669107540
     pkgs/glibc.bst:
     - ref: 64c61decc3bfca6f0a01e573aca60fe1f1f671e04cac6aa61de9f3a155601e01
     pkgs/gettext.bst:
@@ -72,4 +72,4 @@ projects:
     - ref: 629402e313b9501e79df8fd987882781b4c7f9e8c31264820d042c698a69a111
     - ref: f073a2e21e5828c50c9fb6d365111687ffcb23162f965904f2598c41bc50fa6c
     - ref: 5bc87f1b22d45cebb28bc25370d8bab2a9a0b316fd82e49aae9b8cd7b19cda20
-    - ref: c0841686ff347e448f73ae7b1a54926cb427f8ae083f9092d0ef16b55e8d7769
+    - ref: 129bc1ab06d123098cfc2dc805d66f411f4fac0cd33da81ea5805d00b8f4e8d0
