@@ -5,7 +5,7 @@ description: |
 
 sources:
 - kind: tar
-  url: github:flucidOS/pkg-src/releases/download/cache-core/m4.tar.xz
+  url: pkgsrc:cache-core/m4.tar.xz
   # ref: must exist in project.refs
 
 build-depends:
