@@ -14,7 +14,7 @@ build-depends:
 
 variables:
   build-dir: build
-  conf-local: >-
+  conf-args: >-
     --target=%{bootstrap-triplet}
     --with-sysroot=%{bootstrap-sysroot}
     --with-lib-path=%{libdir}
