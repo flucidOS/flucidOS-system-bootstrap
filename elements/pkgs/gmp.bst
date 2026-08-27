@@ -5,5 +5,6 @@ sources:
   url: pkgsrc:cache-core/gmp.tar.xz
 build-depends:
 - tools/import-fdo.bst
+- pkgs/m4.bst
 variables:
   conf-args: --prefix=%{prefix} --enable-cxx --disable-static
