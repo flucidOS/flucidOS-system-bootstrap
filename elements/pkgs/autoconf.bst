@@ -1,11 +1,12 @@
 kind: autotools
-description: GNU Autoconf
+
+description: autoconf (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/autoconf.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/autoconf.tar.xz
+
 build-depends:
-- pkgs/m4.bst
-- pkgs/perl.bst
-- tools/import-fdo.bst
-variables:
-  conf-args: --prefix=%{prefix}
+- tools/toolchain.bst
+
+

@@ -1,10 +1,13 @@
 kind: autotools
-description: XZ Utils
+
+description: xz (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/xz.tar.xz
-  # ref managed by track
+  url: github:flucidOS/pkg-src/releases/download/cache-core/xz.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: --prefix=%{prefix} --disable-static --disable-nls
+  conf-local: --disable-nls

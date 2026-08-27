@@ -1,12 +1,15 @@
-kind: manual
-description: zlib compression library
+kind: autotools
+
+description: zlib (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/zlib.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/zlib.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
-config:
-  build-commands:
-  - ./configure --prefix=%{prefix}
-  - make -j%{max-jobs}
-  - make install DESTDIR=%{install-root}
+- tools/toolchain.bst
+
+variables:
+  conf-cmd: "%{conf-root}/configure"
+  conf-local: ""
+  build-dir: "."

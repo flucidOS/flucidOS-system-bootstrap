@@ -1,9 +1,13 @@
 kind: autotools
-description: GNU Coreutils
+
+description: coreutils (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/coreutils.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/coreutils.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: --prefix=%{prefix} --disable-nls
+  conf-local: --enable-no-install-program=kill,uptime --disable-nls

@@ -1,13 +1,14 @@
 kind: autotools
-description: Python 3 (minimal, for build scripts and later tooling)
+
+description: CPython (after native toolchain)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-programming/python.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/python.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: >-
-    --prefix=%{prefix}
-    --enable-shared
-    --without-ensurepip
-    --disable-test-modules
+  build-dir: build
+  conf-local: --without-ensurepip --disable-shared

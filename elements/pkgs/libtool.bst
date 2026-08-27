@@ -1,10 +1,13 @@
 kind: autotools
-description: GNU Libtool
+
+description: libtool (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/libtool.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/libtool.tar.xz
+
 build-depends:
-- pkgs/m4.bst
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: --prefix=%{prefix} --disable-static
+  conf-local: --disable-static

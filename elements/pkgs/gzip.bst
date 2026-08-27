@@ -1,9 +1,13 @@
 kind: autotools
-description: GNU Gzip
+
+description: gzip (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/gzip.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/gzip.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: --prefix=%{prefix}
+  conf-local: --disable-nls

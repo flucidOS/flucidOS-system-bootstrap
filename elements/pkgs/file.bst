@@ -1,9 +1,13 @@
 kind: autotools
-description: file – determine file type
+
+description: file (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/file.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/file.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: --prefix=%{prefix} --disable-static
+  conf-local: --disable-nls

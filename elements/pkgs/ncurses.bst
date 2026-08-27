@@ -1,14 +1,13 @@
 kind: autotools
-description: ncurses library
+
+description: ncurses (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/ncurses.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/ncurses.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: >-
-    --prefix=%{prefix}
-    --with-shared
-    --without-debug
-    --without-ada
-    --enable-widec
+  conf-local: --with-shared --without-debug --without-ada --enable-widec --disable-nls

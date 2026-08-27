@@ -1,10 +1,9 @@
 kind: autotools
-description: elfutils (eu-*) – needed for debuginfo handling
+description: elfutils
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/elfutils.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/elfutils.tar.xz
 build-depends:
-- pkgs/zlib.bst
-- tools/import-fdo.bst
+- tools/toolchain.bst
 variables:
-  conf-args: --prefix=%{prefix} --disable-debuginfod --disable-libdebuginfod
+  conf-local: --disable-debuginfod --disable-libdebuginfod

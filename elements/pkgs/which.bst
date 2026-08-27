@@ -1,9 +1,12 @@
 kind: autotools
-description: GNU which
+
+description: which (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-system-utilities/which.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/which.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
-variables:
-  conf-args: --prefix=%{prefix}
+- tools/toolchain.bst
+
+

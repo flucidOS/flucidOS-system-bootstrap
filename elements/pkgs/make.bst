@@ -1,9 +1,13 @@
 kind: autotools
-description: GNU Make
+
+description: make (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/make.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/make.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: --prefix=%{prefix} --disable-nls
+  conf-local: --disable-nls

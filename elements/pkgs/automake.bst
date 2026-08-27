@@ -1,11 +1,12 @@
 kind: autotools
-description: GNU Automake
+
+description: automake (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/automake.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/automake.tar.xz
+
 build-depends:
-- pkgs/autoconf.bst
-- pkgs/perl.bst
-- tools/import-fdo.bst
-variables:
-  conf-args: --prefix=%{prefix}
+- tools/toolchain.bst
+
+

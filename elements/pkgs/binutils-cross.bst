@@ -1,18 +1,28 @@
 kind: autotools
-description: First stage cross binutils
+
+description: |
+  Cross binutils – first package built (carbonOS).
+  Host gcc comes only from tools/import-fdo.bst.
 
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/binutils.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/binutils.tar.xz
 
 build-depends:
+- freedesktop-sdk.bst:components/texinfo.bst
 - tools/import-fdo.bst
-- tools/sysroot-setup.bst
 
 variables:
+  build-dir: build
   conf-local: >-
-    --target=%{bootstrap-triplet}
     --with-sysroot=%{bootstrap-sysroot}
+    --target=%{bootstrap-triplet}
     --with-lib-path=%{libdir}
-    --disable-werror
-    --disable-plugins
+    --disable-nls --disable-werror --disable-plugins
+
+config:
+  install-commands:
+    (>):
+    - ln -sv lib %{install-root}%{prefix}/lib64
+    - rm -rf %{install-root}%{datadir}/info
+    - rm -rf %{install-root}%{libdir}/bfd-plugins

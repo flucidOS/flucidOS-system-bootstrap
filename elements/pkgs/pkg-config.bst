@@ -1,9 +1,13 @@
 kind: autotools
-description: pkg-config
+
+description: pkg-config (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/pkgconf.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/pkg-config.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: --prefix=%{prefix} --with-internal-glib --disable-host-tool
+  conf-local: --with-internal-glib --disable-host-tool

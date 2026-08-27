@@ -1,9 +1,13 @@
 kind: autotools
-description: GNU Diffutils
+
+description: diffutils (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/diffutils.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/diffutils.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: --prefix=%{prefix} --disable-nls
+  conf-local: --disable-nls

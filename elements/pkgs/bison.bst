@@ -1,10 +1,13 @@
 kind: autotools
-description: GNU Bison parser generator
+
+description: bison (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/bison.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/bison.tar.xz
+
 build-depends:
-- pkgs/m4.bst
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: --prefix=%{prefix} --disable-nls
+  conf-local: --disable-nls

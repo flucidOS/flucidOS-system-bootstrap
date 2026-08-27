@@ -1,14 +1,13 @@
 kind: autotools
-description: GNU gettext (minimal, for build scripts)
+
+description: gettext (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/gettext.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/gettext.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: >-
-    --prefix=%{prefix}
-    --disable-nls
-    --disable-java
-    --disable-csharp
-    --disable-libasprintf
+  conf-local: --disable-nls --disable-java --disable-csharp

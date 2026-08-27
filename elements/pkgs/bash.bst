@@ -1,12 +1,13 @@
 kind: autotools
-description: GNU Bash (required for almost every configure script)
+
+description: bash (after native toolchain – carbonOS)
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/bash.tar.xz
+  url: github:flucidOS/pkg-src/releases/download/cache-core/bash.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
+- tools/toolchain.bst
+
 variables:
-  conf-args: >-
-    --prefix=%{prefix}
-    --without-bash-malloc
-    --disable-nls
+  conf-local: --without-bash-malloc --disable-nls
