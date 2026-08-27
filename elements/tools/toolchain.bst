@@ -1,4 +1,12 @@
 kind: stack
-description: Convenience stack that pulls the full adjusted bootstrap
+description: |
+  The native toolchain barrier.
+  General packages MUST depend on this, not import-fdo.
+
 depends:
-- adjusted.bst
+- pkgs/linux-api-headers.bst
+- pkgs/glibc.bst
+- pkgs/binutils.bst
+- pkgs/gcc.bst
+- tools/sysroot-setup.bst
+- tools/import-fdo.bst

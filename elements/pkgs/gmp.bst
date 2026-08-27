@@ -1,10 +1,14 @@
 kind: autotools
-description: GNU Multiple Precision Arithmetic Library
+description: GNU M4 macro processor
+
 sources:
 - kind: tar
-  url: pkgsrc:cache-core/gmp.tar.xz
+  url: pkgsrc:cache-core/m4.tar.xz
+
 build-depends:
-- tools/import-fdo.bst
-- pkgs/m4.bst
+- tools/toolchain.bst  # <--- THIS IS THE FIX. Do NOT use import-fdo.bst here.
+
 variables:
-  conf-args: --prefix=%{prefix} --enable-cxx --disable-static
+  conf-args: >-
+    --prefix=%{prefix}
+    --disable-nls
