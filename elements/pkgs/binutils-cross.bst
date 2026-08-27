@@ -1,13 +1,13 @@
 kind: autotools
 
 description: |
-  Cross binutils. First stage — host gcc comes only from import-fdo
-  (bootstrap-import). Do not depend on toolchain.bst.
+  Cross binutils. First stage — host gcc from import-fdo (bootstrap-import).
+  Do not depend on toolchain.bst.
 
 sources:
 - kind: tar
-  url: https://github.com/flucidOS/pkg-src/releases/download/cache-core/binutils.tar.xz
-  ref: eeddc2fbd3f9d3af7ce7f93039bce24d467770f5f701ba85810a1fecb29bfca1
+  url: github:flucidOS/pkg-src/releases/download/cache-core/binutils.tar.xz
+  # ref: must exist in project.refs (track if missing)
 
 build-depends:
 - tools/import-fdo.bst
