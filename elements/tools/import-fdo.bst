@@ -1,13 +1,7 @@
 kind: stack
-
-description: |
-  Host tools from Freedesktop SDK for the earliest bootstrap stages.
-  bootstrap-import.bst is required: it stages a working host gcc, binutils,
-  glibc, make, coreutils, etc. public-stacks/buildsystem-autotools alone
-  does NOT provide a C compiler (only autoconf/automake/libtool scripts).
+description: Imports host compiler and basic tools from Freedesktop SDK.
 
 depends:
-- freedesktop-sdk.bst:bootstrap-import.bst
 - freedesktop-sdk.bst:public-stacks/buildsystem-autotools.bst
 - freedesktop-sdk.bst:components/bison.bst
 - freedesktop-sdk.bst:components/gzip.bst

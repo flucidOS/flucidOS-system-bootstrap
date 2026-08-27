@@ -1,7 +1,5 @@
 kind: stack
-description: |
-  The native toolchain barrier.
-  General packages MUST depend on this, not import-fdo.
+description: Native toolchain barrier
 
 depends:
 - pkgs/linux-api-headers.bst

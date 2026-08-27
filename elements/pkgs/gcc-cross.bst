@@ -1,8 +1,5 @@
 kind: autotools
-
-description: |
-  First stage: cross GCC (C only) used to build the bootstrap glibc.
-  Built against binutils-cross.
+description: First stage cross GCC (C only)
 
 sources:
 - kind: tar
@@ -23,12 +20,10 @@ build-depends:
 - tools/sysroot-setup.bst
 
 variables:
-  conf-args: >-
-    --prefix=%{prefix}
+  conf-local: >-
     --target=%{bootstrap-triplet}
     --with-sysroot=%{bootstrap-sysroot}
     --enable-languages=c
-    --disable-nls
     --disable-shared
     --disable-threads
     --disable-multilib

@@ -19,14 +19,12 @@ build-depends:
 - pkgs/binutils.bst
 - pkgs/glibc.bst
 - pkgs/linux-api-headers.bst
-- tools/import-fdo.bst
 - tools/sysroot-setup.bst
+- tools/import-fdo.bst
 
 variables:
-  conf-args: >-
-    --prefix=%{prefix}
+  conf-local: >-
     --enable-languages=c,c++
-    --disable-nls
     --disable-multilib
     --enable-default-pie
     --enable-default-ssp

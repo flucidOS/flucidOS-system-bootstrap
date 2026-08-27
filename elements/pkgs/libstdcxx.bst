@@ -6,22 +6,22 @@ sources:
   url: pkgsrc:cache-programming/gcc.tar.xz
 
 build-depends:
+- tools/import-fdo.bst
 - pkgs/gcc-cross.bst
 - pkgs/binutils-cross.bst
 - pkgs/glibc.bst
 - pkgs/linux-api-headers.bst
-- tools/import-fdo.bst
 - tools/sysroot-setup.bst
 
 variables:
-  # Target the nested libstdc++ folder inside the extracted GCC tarball
-  conf-root: "%{build-root}/libstdc++-v3"
-  conf-args: >-
-    --prefix=%{prefix}
+  conf-cmd: "%{build-root}/libstdc++-v3/configure"
+  gcc-version: $(%{bootstrap-triplet}-gcc -dumpversion)
+  conf-local: >-
     --host=%{bootstrap-triplet}
     --disable-multilib
-    --disable-nls
+    --disable-libstdcxx-threads
     --disable-libstdcxx-pch
+    --with-gxx-include-dir=%{prefix}/%{bootstrap-triplet}/include/c++/%{gcc-version}
 environment:
   CC: "%{bootstrap-triplet}-gcc"
   CXX: "%{bootstrap-triplet}-g++"
