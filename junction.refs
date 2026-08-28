@@ -1,0 +1,4 @@
+projects:
+  flucidOS-bootstrap:
+    freedesktop-sdk.bst:
+    - ref: 9d578f5baa41725b843601cf3e55b1819871cc52
