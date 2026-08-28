@@ -1,8 +1,11 @@
 kind: autotools
 
 description: |
-  Cross binutils – first package built (carbonOS).
-  Host gcc comes only from tools/import-fdo.bst.
+  Cross binutils – first package (carbonOS / LFS).
+  pkg-src binutils tarball is a git-style tree (bfd/development.sh has
+  development=true), which re-adds -Werror after configure. Force
+  development=false and pass -Wno-error so GCC 14 does not fail on
+  gas/gasp.c format-overflow.
 
 sources:
 - kind: tar
@@ -13,36 +16,25 @@ build-depends:
 - tools/import-fdo.bst
 
 environment:
-  CFLAGS: "%{cflags}"
-  CXXFLAGS: "%{cxxflags}"
-  LDFLAGS: "%{ldflags}"
+  # Last matching flag wins; keep -Wno-error after any package defaults
+  CFLAGS: "-O2 -g -Wno-error"
+  CXXFLAGS: "-O2 -g -Wno-error"
 
 variables:
   build-dir: build
-  
-  # Relax GCC 14 strictness for older autotools and clear target sysroot flags
-  cflags: "-O2 -g -Wno-error=implicit-int -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types -Wno-error=format-overflow -Wno-error=format-truncation -Wno-error=stringop-overflow"
-  cxxflags: "-O2 -g"
-  ldflags: ""
-
   conf-local: >-
     --with-sysroot=%{bootstrap-sysroot}
     --target=%{bootstrap-triplet}
     --with-lib-path=%{libdir}
-    --disable-nls --disable-werror --disable-plugins
-        
+    --disable-nls
+    --disable-werror
+    --disable-plugins
+
 config:
   configure-commands:
     (<):
     - |
-      # binutils re-enables -Werror by default whenever bfd/development.sh
-      # says development=true (true for git/dev snapshots, false in real
-      # GNU release tarballs). Our mirrored source tarball still has
-      # development=true, so gas/ld/etc. re-add -Werror to their compile
-      # flags AFTER our CFLAGS, silently overriding --disable-werror and
-      # any -Wno-error=... we set in CFLAGS (GCC: last matching flag on
-      # the command line wins). Flip it here instead of chasing every
-      # individual warning category one GCC-14 error at a time.
+      # git/dev snapshots set this; release tarballs do not
       if [ -f bfd/development.sh ]; then
         sed -i 's/^development=true/development=false/' bfd/development.sh
       fi
