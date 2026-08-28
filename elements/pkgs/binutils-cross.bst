@@ -14,12 +14,18 @@ build-depends:
 
 variables:
   build-dir: build
+  
+  # Prevent global target sysroot flags from bleeding into the host build
+  cflags: "-O2 -g"
+  cxxflags: "-O2 -g"
+  ldflags: ""
+
   conf-local: >-
     --with-sysroot=%{bootstrap-sysroot}
     --target=%{bootstrap-triplet}
     --with-lib-path=%{libdir}
     --disable-nls --disable-werror --disable-plugins
-
+    
 config:
   install-commands:
     (>):
