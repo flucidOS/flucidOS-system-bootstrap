@@ -12,6 +12,11 @@ build-depends:
 - freedesktop-sdk.bst:components/texinfo.bst
 - tools/import-fdo.bst
 
+environment:
+  CFLAGS: "%{cflags}"
+  CXXFLAGS: "%{cxxflags}"
+  LDFLAGS: "%{ldflags}"
+
 variables:
   build-dir: build
   

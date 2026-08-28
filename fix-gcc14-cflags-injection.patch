@@ -1,0 +1,32 @@
+diff --git a/elements/pkgs/binutils-cross.bst b/elements/pkgs/binutils-cross.bst
+index d38fdf9..a3b13c4 100644
+--- a/elements/pkgs/binutils-cross.bst
++++ b/elements/pkgs/binutils-cross.bst
+@@ -12,6 +12,11 @@ build-depends:
+ - freedesktop-sdk.bst:components/texinfo.bst
+ - tools/import-fdo.bst
+ 
++environment:
++  CFLAGS: "%{cflags}"
++  CXXFLAGS: "%{cxxflags}"
++  LDFLAGS: "%{ldflags}"
++
+ variables:
+   build-dir: build
+   
+diff --git a/elements/pkgs/gcc-cross.bst b/elements/pkgs/gcc-cross.bst
+index 6a02da6..0ac6476 100644
+--- a/elements/pkgs/gcc-cross.bst
++++ b/elements/pkgs/gcc-cross.bst
+@@ -22,6 +22,11 @@ build-depends:
+ - pkgs/binutils-cross.bst
+ - tools/sysroot-setup.bst
+ 
++environment:
++  CFLAGS: "%{cflags}"
++  CXXFLAGS: "%{cxxflags}"
++  LDFLAGS: "%{ldflags}"
++
+ variables:
+   build-dir: build
+ 

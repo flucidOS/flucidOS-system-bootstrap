@@ -22,6 +22,11 @@ build-depends:
 - pkgs/binutils-cross.bst
 - tools/sysroot-setup.bst
 
+environment:
+  CFLAGS: "%{cflags}"
+  CXXFLAGS: "%{cxxflags}"
+  LDFLAGS: "%{ldflags}"
+
 variables:
   build-dir: build
 
