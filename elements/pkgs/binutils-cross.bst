@@ -15,8 +15,8 @@ build-depends:
 variables:
   build-dir: build
   
-  # Prevent global target sysroot flags from bleeding into the host build
-  cflags: "-O2 -g"
+  # Relax GCC 14 strictness for older autotools and clear target sysroot flags
+  cflags: "-O2 -g -Wno-error=implicit-int -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types"
   cxxflags: "-O2 -g"
   ldflags: ""
 
@@ -25,7 +25,7 @@ variables:
     --target=%{bootstrap-triplet}
     --with-lib-path=%{libdir}
     --disable-nls --disable-werror --disable-plugins
-    
+        
 config:
   install-commands:
     (>):
