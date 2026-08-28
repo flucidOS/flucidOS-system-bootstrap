@@ -32,6 +32,20 @@ variables:
     --disable-nls --disable-werror --disable-plugins
         
 config:
+  configure-commands:
+    (<):
+    - |
+      # binutils re-enables -Werror by default whenever bfd/development.sh
+      # says development=true (true for git/dev snapshots, false in real
+      # GNU release tarballs). Our mirrored source tarball still has
+      # development=true, so gas/ld/etc. re-add -Werror to their compile
+      # flags AFTER our CFLAGS, silently overriding --disable-werror and
+      # any -Wno-error=... we set in CFLAGS (GCC: last matching flag on
+      # the command line wins). Flip it here instead of chasing every
+      # individual warning category one GCC-14 error at a time.
+      if [ -f bfd/development.sh ]; then
+        sed -i 's/^development=true/development=false/' bfd/development.sh
+      fi
   install-commands:
     (>):
     - ln -sv lib %{install-root}%{prefix}/lib64
