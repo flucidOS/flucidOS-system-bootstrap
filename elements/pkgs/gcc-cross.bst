@@ -24,6 +24,11 @@ build-depends:
 
 variables:
   build-dir: build
+
+  cflags: "-O2 -g -Wno-error=implicit-int -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types"
+  cxxflags: "-O2 -g"
+  ldflags: ""
+  
   conf-local: >-
     --target=%{bootstrap-triplet}
     --with-sysroot=%{bootstrap-sysroot}
