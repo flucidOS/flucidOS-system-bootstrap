@@ -1,11 +1,11 @@
 kind: autotools
 
 description: |
-  Cross binutils – first package (carbonOS / LFS).
-  pkg-src binutils tarball is a git-style tree (bfd/development.sh has
-  development=true), which re-adds -Werror after configure. Force
-  development=false and pass -Wno-error so GCC 14 does not fail on
-  gas/gasp.c format-overflow.
+  Cross binutils.
+  pkg-src tree is git-style (bfd/development.sh development=true), which
+  re-enables -Werror after configure. Force development=false before
+  configure; pass -Wno-error only to make (not environment CFLAGS — that
+  breaks the configure link test: "C compiler cannot create executables").
 
 sources:
 - kind: tar
@@ -14,11 +14,6 @@ sources:
 build-depends:
 - freedesktop-sdk.bst:components/texinfo.bst
 - tools/import-fdo.bst
-
-environment:
-  # Last matching flag wins; keep -Wno-error after any package defaults
-  CFLAGS: "-O2 -g -Wno-error"
-  CXXFLAGS: "-O2 -g -Wno-error"
 
 variables:
   build-dir: build
@@ -29,12 +24,13 @@ variables:
     --disable-nls
     --disable-werror
     --disable-plugins
+  # Only for the build, not configure
+  make-args: -j%{max-jobs} CFLAGS="-O2 -Wno-error" CXXFLAGS="-O2 -Wno-error"
 
 config:
   configure-commands:
     (<):
     - |
-      # git/dev snapshots set this; release tarballs do not
       if [ -f bfd/development.sh ]; then
         sed -i 's/^development=true/development=false/' bfd/development.sh
       fi
