@@ -16,7 +16,6 @@ jobs:
       image: docker.io/buildstream/buildstream:latest
       options: --privileged
       volumes:
-        # so we can docker import/push from inside the job
         - /var/run/docker.sock:/var/run/docker.sock
 
     defaults:
@@ -27,17 +26,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Compile the Toolchain
+      - name: Install Python deps for FDO plugins
         run: |
-          bst --colors --no-interactive build all.bst
+          pip install --user 'requests>=2.28' 'dulwich>=0.21' || \
+            pip install --break-system-packages 'requests>=2.28' 'dulwich>=0.21' || \
+            pip install 'requests>=2.28' 'dulwich>=0.21'
+          python3 -c "import requests, dulwich; print('requests', requests.__version__)"
+
+      - name: Compile the Toolchain
+        run: bst --colors --no-interactive build all.bst
 
       - name: Export the Rootfs
-        run: |
-          bst artifact checkout all.bst --directory ./bootstrap-root
+        run: bst artifact checkout all.bst --directory ./bootstrap-root
 
       - name: Install Docker CLI
         run: |
-          # buildstream image may not ship the docker client; socket is from the host
           if ! command -v docker >/dev/null 2>&1; then
             apt-get update
             apt-get install -y docker.io || apt-get install -y docker-cli || true
