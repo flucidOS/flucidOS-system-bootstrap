@@ -1,0 +1,23 @@
+projects:
+  flucidOS-bootstrap:
+    pkgs/binutils.bst:
+    - ref: eeddc2fbd3f9d3af7ce7f93039bce24d467770f5f701ba85810a1fecb29bfca1
+    pkgs/binutils-cross.bst:
+    - ref: eeddc2fbd3f9d3af7ce7f93039bce24d467770f5f701ba85810a1fecb29bfca1
+    pkgs/gmp.bst:
+    - ref: 129bc1ab06d123098cfc2dc805d66f411f4fac0cd33da81ea5805d00b8f4e8d0
+    pkgs/glibc.bst:
+    - ref: 64c61decc3bfca6f0a01e573aca60fe1f1f671e04cac6aa61de9f3a155601e01
+    pkgs/linux-api-headers.bst:
+    - ref: 6d4e735c326d58e51069a36bafead96efe21d7177e9813fd2c312a3a5e5d4f36
+    pkgs/libstdcxx.bst:
+    - ref: d9b46f6c3b820d154a463ee521df02039f6a51e11a77651991b1954cd1aa591b
+    pkgs/gcc-cross.bst:
+    - ref: d9b46f6c3b820d154a463ee521df02039f6a51e11a77651991b1954cd1aa591b
+    - ref: f073a2e21e5828c50c9fb6d365111687ffcb23162f965904f2598c41bc50fa6c
+    - ref: 5bc87f1b22d45cebb28bc25370d8bab2a9a0b316fd82e49aae9b8cd7b19cda20
+    - ref: 129bc1ab06d123098cfc2dc805d66f411f4fac0cd33da81ea5805d00b8f4e8d0
+    pkgs/gcc.bst:
+    - ref: d9b46f6c3b820d154a463ee521df02039f6a51e11a77651991b1954cd1aa591b
+    - ref: f073a2e21e5828c50c9fb6d365111687ffcb23162f965904f2598c41bc50fa6c
+    - ref: 5bc87f1b22d45cebb28bc25370d8bab2a9a0b316fd82e49aae9b8cd7b19cda20
