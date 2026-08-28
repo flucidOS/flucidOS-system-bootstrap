@@ -1,0 +1,26 @@
+diff --git a/elements/pkgs/binutils-cross.bst b/elements/pkgs/binutils-cross.bst
+index ac7f17d..ac7f17d 100644
+--- a/elements/pkgs/binutils-cross.bst
++++ b/elements/pkgs/binutils-cross.bst
+@@ -18,7 +18,7 @@ variables:
+   build-dir: build
+   
+   # Relax GCC 14 strictness for older autotools and clear target sysroot flags
+-  cflags: "-O2 -g -Wno-error=implicit-int -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types"
++  cflags: "-O2 -g -Wno-error=implicit-int -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types -Wno-error=format-overflow -Wno-error=format-truncation -Wno-error=stringop-overflow"
+   cxxflags: "-O2 -g"
+   ldflags: ""
+ 
+diff --git a/elements/pkgs/gcc-cross.bst b/elements/pkgs/gcc-cross.bst
+index 8d7d3ed..8d7d3ed 100644
+--- a/elements/pkgs/gcc-cross.bst
++++ b/elements/pkgs/gcc-cross.bst
+@@ -29,7 +29,7 @@ variables:
+ variables:
+   build-dir: build
+ 
+-  cflags: "-O2 -g -Wno-error=implicit-int -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types"
++  cflags: "-O2 -g -Wno-error=implicit-int -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types -Wno-error=format-overflow -Wno-error=format-truncation -Wno-error=stringop-overflow"
+   cxxflags: "-O2 -g"
+   ldflags: ""
+   
