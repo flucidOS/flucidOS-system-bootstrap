@@ -1,0 +1,9 @@
+--- a/bfd/development.sh
++++ b/bfd/development.sh
+@@ -1,6 +1,6 @@
+ # This file is meant to be sourced by the other scripts in this directory.
+ 
+-development=true
++development=false
+ 
+ # Minimum supported version of GNU make for all tools:

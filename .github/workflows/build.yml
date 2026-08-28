@@ -2,8 +2,8 @@ name: FlucidOS Toolchain Bootstrap
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch: 
+    branches: ["main"]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -11,34 +11,38 @@ permissions:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-22.04 # Correct kernel permissions for bwrap unprivileged userns
-    
+    runs-on: ubuntu-22.04
+    container:
+      image: docker.io/buildstream/buildstream:latest
+      options: --privileged
+      volumes:
+        # so we can docker import/push from inside the job
+        - /var/run/docker.sock:/var/run/docker.sock
+
+    defaults:
+      run:
+        shell: bash
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Maximize Build Space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
-
-      - name: Install Build Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y lzip bubblewrap
-          pipx install BuildStream
-          pipx inject BuildStream dulwich requests buildstream-plugins
-
       - name: Compile the Toolchain
         run: |
-          # If any package is missing a ref in project.refs, bst will alert here
-          bst build all.bst
+          bst --colors --no-interactive build all.bst
 
       - name: Export the Rootfs
         run: |
           bst artifact checkout all.bst --directory ./bootstrap-root
+
+      - name: Install Docker CLI
+        run: |
+          # buildstream image may not ship the docker client; socket is from the host
+          if ! command -v docker >/dev/null 2>&1; then
+            apt-get update
+            apt-get install -y docker.io || apt-get install -y docker-cli || true
+          fi
+          docker version
 
       - name: Authenticate with GitHub Container Registry
         uses: docker/login-action@v3
@@ -50,7 +54,6 @@ jobs:
       - name: Build and Push OCI Image
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/flucidos-bootstrap:latest
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          
-          tar -cC ./bootstrap-root . | docker import - $IMAGE_ID
-          docker push $IMAGE_ID
+          IMAGE_ID=$(echo "$IMAGE_ID" | tr '[:upper:]' '[:lower:]')
+          tar -cC ./bootstrap-root . | docker import - "$IMAGE_ID"
+          docker push "$IMAGE_ID"
