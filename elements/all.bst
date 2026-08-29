@@ -1,5 +1,5 @@
 kind: stack
-description: Full bootstrap (unadjusted + adjusted)
+description: Build everything
 
 depends:
 - unadjusted.bst

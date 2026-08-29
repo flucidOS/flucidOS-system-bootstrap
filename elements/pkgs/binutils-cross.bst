@@ -1,30 +1,28 @@
 kind: autotools
+description: Binutils cross-compiler for FlucidOS
 
-description: |
-  Cross binutils – first package.
-  Use a GNU *release* binutils.tar.xz (development=false).
+depends:
+- filename: tools/import-fdo.bst
+  type: build
+- filename: tools/sysroot-setup.bst
+  type: build
 
 sources:
 - kind: tar
-  url: github:flucidOS/pkg-src/releases/download/cache-core/binutils.tar.xz
+  url: gnu:binutils/binutils-2.42.tar.xz
 
-build-depends:
-- freedesktop-sdk.bst:components/texinfo.bst
-- tools/import-fdo.bst
-
+  ref: f6e4d41fd5fc778b06b7891457b3620da5ecea1006c6a4a41ae998109f85a800
 variables:
-  build-dir: build
+  # Override BuildStream's default /usr paths
+  prefix: /tools
+  sysconfdir: /tools/etc
+  localstatedir: /tools/var
+  infodir: /tools/share/info
+  mandir: /tools/share/man
+
   conf-local: >-
-    --with-sysroot=%{bootstrap-sysroot}
-    --target=%{bootstrap-triplet}
-    --with-lib-path=%{libdir}
+    --with-sysroot=/sysroot
+    --target=%{target_arch}-flucidos-linux-gnu
     --disable-nls
     --disable-werror
-    --disable-plugins
-
-config:
-  install-commands:
-    (>):
-    - ln -sv lib %{install-root}%{prefix}/lib64
-    - rm -rf %{install-root}%{datadir}/info
-    - rm -rf %{install-root}%{libdir}/bfd-plugins
+    --with-lib-path=/tools/lib

@@ -1,7 +1,12 @@
 kind: stack
-description: Early + mid + final toolchain (before path adjustment)
+description: FlucidOS API - Toolchain linked against bootstrap libs
 
 depends:
-- tools/toolchain.bst
-- tools/import-fdo.bst
-- tools/sysroot-setup.bst
+- pkgs/linux-api-headers.bst
+- pkgs/glibc.bst
+- pkgs/binutils.bst
+- pkgs/gcc.bst
+- pkgs/bash.bst
+- pkgs/coreutils.bst
+- pkgs/make.bst
+- pkgs/tar.bst

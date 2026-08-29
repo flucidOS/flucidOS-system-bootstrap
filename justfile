@@ -1,10 +1,16 @@
-bst := "bst --colors --no-interactive"
+# justfile for flucidOS-system-bootstrap
 
 build:
-    {{bst}} build all.bst
+	bst build all.bst
+
+unadjusted:
+	bst build unadjusted.bst
+
+adjusted:
+	bst build adjusted.bst
 
 track:
-    {{bst}} source track -d all all.bst
+	bst track --all
 
-show TARGET:
-    {{bst}} show {{TARGET}}
+shell pkg:
+	bst shell --build pkgs/{{pkg}}.bst

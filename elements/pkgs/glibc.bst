@@ -1,40 +1,72 @@
 kind: autotools
+description: Bootstrap glibc installed into /sysroot
 
-description: |
-  Bootstrap glibc installed into %{bootstrap-sysroot} (carbonOS / LFS).
+depends:
+- filename: tools/import-fdo.bst
+  type: build
+- filename: tools/sysroot-setup.bst
+  type: build
+- filename: pkgs/linux-api-headers.bst
+  type: build
+- filename: pkgs/binutils-cross.bst
+  type: build
+- filename: pkgs/gcc-cross.bst
+  type: build
 
 sources:
 - kind: tar
   url: github:flucidOS/pkg-src/releases/download/cache-core/glibc.tar.xz
-
-build-depends:
-- tools/import-fdo.bst
-- tools/sysroot-setup.bst
-- pkgs/linux-api-headers.bst
-- pkgs/binutils-cross.bst
-- pkgs/gcc-cross.bst
+  ref: 64c61decc3bfca6f0a01e573aca60fe1f1f671e04cac6aa61de9f3a155601e01
 
 environment:
+  PATH: "/tools/bin:/usr/bin:/bin:/usr/sbin:/sbin"
   CC: "%{bootstrap-triplet}-gcc"
   CXX: "%{bootstrap-triplet}-g++"
 
 variables:
-  build-dir: build
+  bootstrap-triplet: "%{target_arch}-flucidos-linux-gnu"
+  bootstrap-sysroot: "/sysroot"
+
+  # Out-of-tree build: BuildStream creates ./build and runs every command inside it.
+  command-subdir: build
+  conf-root: ".."
+
+  # Disable autogen/autoreconf fallback to preserve our sed patches
+  autogen: ""
+  prefix: /usr
+
+  # Inject bypasses for the crt1.o chicken-and-egg configure tests
   conf-local: >-
     --host=%{bootstrap-triplet}
-    --prefix=/usr
     --with-headers=%{bootstrap-sysroot}/usr/include
     --disable-multilib
     --disable-nls
     --enable-kernel=4.19
     libc_cv_slibdir=/usr/lib
+    libc_cv_forced_unwind=yes
+    libc_cv_c_cleanup=yes
+    libc_cv_cxx_far_data=no
 
 config:
-  install-commands:
-    (>):
+  configure-commands:
+    (<):
     - |
+      # Neutralize the fatal regex version check for modern binutils/gcc
+      sed -i 's/-n "\$critic_missing" &&/-n "" \&\&/' ../configure
+
+  build-commands:
+    (=):
+    - make -j%{max-jobs}
+
+  install-commands:
+    (=):
+    - |
+      # Force a serial install to prevent GCC/Glibc race conditions
+      make -j1 DESTDIR="%{install-root}" install
+    - |
+      # Move the natively installed tree into the sysroot
       mkdir -p "%{install-root}%{bootstrap-sysroot}"
-      # Move installed tree under sysroot
+      
       if [ -d "%{install-root}/usr" ]; then
         cp -a "%{install-root}/usr" "%{install-root}%{bootstrap-sysroot}/"
         rm -rf "%{install-root}/usr"

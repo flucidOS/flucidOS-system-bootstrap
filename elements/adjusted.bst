@@ -1,6 +1,5 @@
 kind: stack
-description: Final adjusted bootstrap tree
+description: FlucidOS API - Toolchain linked against final OS libs
 
 depends:
-- tools/adjusted-paths.bst
-- tools/toolchain.bst
+- unadjusted.bst

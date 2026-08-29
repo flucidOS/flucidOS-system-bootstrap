@@ -1,0 +1,26 @@
+name: FlucidOS System Bootstrap
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Sandboxing Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap podman just
+
+      - name: Install BuildStream
+        run: |
+          pipx install buildstream
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Build FlucidOS Bootstrap
+        run: just build
