@@ -1,39 +1,107 @@
-kind: autotools
+name: FlucidOS System Bootstrap
 
-description: Final (native) binutils linked against bootstrap glibc (carbonOS)
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 
-sources:
-- kind: tar
-  url: github:flucidOS/pkg-src/releases/download/cache-core/binutils.tar.xz
+permissions:
+  contents: read
+  packages: write
 
-build-depends:
-- tools/import-fdo.bst
-- pkgs/gcc-cross.bst
-- pkgs/binutils-cross.bst
-- pkgs/glibc.bst
-- pkgs/linux-api-headers.bst
-- tools/sysroot-setup.bst
-- freedesktop-sdk.bst:components/texinfo.bst
+jobs:
+  build-bootstrap:
+    runs-on: ubuntu-24.04   # pinned explicitly — don't ride "ubuntu-latest"
 
-environment:
-  CC: "%{bootstrap-triplet}-gcc"
-  AR: "%{bootstrap-triplet}-ar"
-  RANLIB: "%{bootstrap-triplet}-ranlib"
+    steps:
+      - uses: actions/checkout@v4
 
-variables:
-  build-dir: build
-  conf-local: >-
-    --with-sysroot=%{sysroot}
-    --with-lib-path=%{libdir}
-    --disable-nls
-    --disable-werror
-    --enable-deterministic-archives
-    --enable-gold
-    --enable-ld=default
-    --enable-plugins
+      - name: install sandboxing deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap just zstd lzip
 
-config:
-  install-commands:
-    (>):
-    - ln -sv lib %{install-root}%{prefix}/lib64 || true
-    - rm -rf %{install-root}%{datadir}/info
+      # GOTCHA 1: BuildStream's sandbox is bubblewrap. Ubuntu 24.04's
+      # AppArmor policy blocks unprivileged user namespaces by default —
+      # without this you hit "bwrap: setting up uid map: Permission
+      # denied". The sysctl pair takes effect immediately, no reload,
+      # and doesn't care where bwrap is installed on disk (unlike a
+      # per-binary AppArmor profile, which has to match bwrap's exact
+      # path). Fine on a runner that only exists for this one job.
+      - name: allow unprivileged userns for bwrap
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
+
+      # buildstream and buildstream-plugins MUST land in the same
+      # environment `bst` actually runs from.
+      #   - pipx would isolate buildstream in its own venv, and
+      #     buildstream-plugins would never reach it — bst then fails to
+      #     load the autotools/make plugins project.conf declares, and
+      #     plugins/gnu.py (which subclasses
+      #     buildstream_plugins.elements.autotools) fails to import.
+      #   - `pip install --user` as root silently no-ops on Debian/Ubuntu
+      #     (uid 0 has the user-site directory disabled), so it looks
+      #     like it succeeded and then ModuleNotFoundError shows up later.
+      # A plain venv avoids both failure modes.
+      - name: install buildstream + plugins
+        run: |
+          python3 -m venv "$HOME/.bst-venv"
+          "$HOME/.bst-venv/bin/pip" install --upgrade pip
+          "$HOME/.bst-venv/bin/pip" install dulwich requests buildstream buildstream-plugins
+          echo "$HOME/.bst-venv/bin" >> "$GITHUB_PATH"
+
+      - uses: oras-project/setup-oras@v1
+
+      - name: clear buildstream cache for fresh build
+        run: |
+          rm -rf ~/.cache/buildstream
+
+      # GOTCHA 3: free hosted runners are ~14GB disk / 2 core. A
+      # freedesktop-sdk bootstrap + ~525 packages from scratch will
+      # likely blow past that. GHCR can't be a drop-in
+      # bst-artifact-server (BuildStream's remote cache is gRPC
+      # CAS/ByteStream; GHCR speaks the OCI Distribution Spec over
+      # HTTP — different wire protocols, not just different auth), but
+      # snapshotting the whole ~/.cache/buildstream tree as a generic
+      # OCI artifact via oras works today, with no server to run and no
+      # extra cost beyond your existing GHCR usage.
+      #
+      # Tradeoff vs a real bst-artifact-server: this is whole-snapshot,
+      # not per-object, so every run re-uploads/downloads the full
+      # cache rather than just the changed elements. Fine to start;
+      # revisit (e.g. Oracle Cloud Always Free running
+      # bst-artifact-server) once the snapshot is big enough that
+      # transfer time, not build time, is the bottleneck.
+      - name: build bootstrap toolchain
+        run: just build
+
+      - name: snapshot buildstream cache to GHCR
+        if: success()
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          mkdir -p /tmp/cache-snapshot
+          tar -C ~/.cache/buildstream -cf - . | zstd -T0 -o /tmp/cache-snapshot/cache.tar.zst
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u ${{ github.actor }} --password-stdin
+          oras push "ghcr.io/$OWNER/flucidos-bootstrap-cache:latest" \
+            /tmp/cache-snapshot/cache.tar.zst:application/octet-stream --disable-path-validation
+
+      - name: checkout bootstrap rootfs
+        run: bst artifact checkout all.bst --directory ./bootstrap-root
+
+      - name: authenticate with GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: push bootstrap rootfs
+        if: github.event_name != 'pull_request'
+        run: |
+          IMAGE_ID=$(echo "ghcr.io/${{ github.repository_owner }}/flucidos-bootstrap:latest" | tr '[:upper:]' '[:lower:]')
+          tar -cC ./bootstrap-root . | docker import - "$IMAGE_ID"
+          docker push "$IMAGE_ID"

@@ -55,6 +55,10 @@ jobs:
 
       - uses: oras-project/setup-oras@v1
 
+      - name: clear buildstream cache for fresh build
+        run: |
+          rm -rf ~/.cache/buildstream
+
       # GOTCHA 3: free hosted runners are ~14GB disk / 2 core. A
       # freedesktop-sdk bootstrap + ~525 packages from scratch will
       # likely blow past that. GHCR can't be a drop-in
@@ -71,28 +75,18 @@ jobs:
       # revisit (e.g. Oracle Cloud Always Free running
       # bst-artifact-server) once the snapshot is big enough that
       # transfer time, not build time, is the bottleneck.
-      - name: restore buildstream cache from GHCR
-        run: |
-          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          mkdir -p /tmp/cache-restore
-          oras pull "ghcr.io/$OWNER/flucidos-bootstrap-cache:latest" \
-            -o /tmp/cache-restore 2>/dev/null || true
-          if [ -f /tmp/cache-restore/cache.tar.zst ]; then
-            mkdir -p ~/.cache/buildstream
-            zstd -d /tmp/cache-restore/cache.tar.zst -c | tar -C ~/.cache/buildstream -xf -
-          fi
-
       - name: build bootstrap toolchain
         run: just build
 
       - name: snapshot buildstream cache to GHCR
-        if: always()
+        if: success()
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          tar -C ~/.cache/buildstream -cf - . | zstd -T0 -o /tmp/cache.tar.zst
+          mkdir -p /tmp/cache-snapshot
+          tar -C ~/.cache/buildstream -cf - . | zstd -T0 -o /tmp/cache-snapshot/cache.tar.zst
           echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u ${{ github.actor }} --password-stdin
           oras push "ghcr.io/$OWNER/flucidos-bootstrap-cache:latest" \
-            /tmp/cache.tar.zst:application/octet-stream --disable-path-validation
+            /tmp/cache-snapshot/cache.tar.zst:application/octet-stream --disable-path-validation
 
       - name: checkout bootstrap rootfs
         run: bst artifact checkout all.bst --directory ./bootstrap-root
