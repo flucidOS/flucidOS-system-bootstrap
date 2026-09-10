@@ -23,7 +23,7 @@ environment:
 variables:
   build-dir: build
   conf-local: >-
-    --with-sysroot=%{bootstrap-sysroot}
+    --with-sysroot=%{sysroot}
     --with-lib-path=%{libdir}
     --disable-nls
     --disable-werror
