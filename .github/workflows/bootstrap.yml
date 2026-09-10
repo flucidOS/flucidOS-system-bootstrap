@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build-bootstrap:
-    runs-on: ubuntu-24.04   # pinned explicitly — don't ride "ubuntu-latest"
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -23,29 +23,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y bubblewrap just zstd lzip
 
-      # GOTCHA 1: BuildStream's sandbox is bubblewrap. Ubuntu 24.04's
-      # AppArmor policy blocks unprivileged user namespaces by default —
-      # without this you hit "bwrap: setting up uid map: Permission
-      # denied". The sysctl pair takes effect immediately, no reload,
-      # and doesn't care where bwrap is installed on disk (unlike a
-      # per-binary AppArmor profile, which has to match bwrap's exact
-      # path). Fine on a runner that only exists for this one job.
       - name: allow unprivileged userns for bwrap
         run: |
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
 
-      # buildstream and buildstream-plugins MUST land in the same
-      # environment `bst` actually runs from.
-      #   - pipx would isolate buildstream in its own venv, and
-      #     buildstream-plugins would never reach it — bst then fails to
-      #     load the autotools/make plugins project.conf declares, and
-      #     plugins/gnu.py (which subclasses
-      #     buildstream_plugins.elements.autotools) fails to import.
-      #   - `pip install --user` as root silently no-ops on Debian/Ubuntu
-      #     (uid 0 has the user-site directory disabled), so it looks
-      #     like it succeeded and then ModuleNotFoundError shows up later.
-      # A plain venv avoids both failure modes.
       - name: install buildstream + plugins
         run: |
           python3 -m venv "$HOME/.bst-venv"
@@ -59,22 +41,23 @@ jobs:
         run: |
           rm -rf ~/.cache/buildstream
 
-      # GOTCHA 3: free hosted runners are ~14GB disk / 2 core. A
-      # freedesktop-sdk bootstrap + ~525 packages from scratch will
-      # likely blow past that. GHCR can't be a drop-in
-      # bst-artifact-server (BuildStream's remote cache is gRPC
-      # CAS/ByteStream; GHCR speaks the OCI Distribution Spec over
-      # HTTP — different wire protocols, not just different auth), but
-      # snapshotting the whole ~/.cache/buildstream tree as a generic
-      # OCI artifact via oras works today, with no server to run and no
-      # extra cost beyond your existing GHCR usage.
-      #
-      # Tradeoff vs a real bst-artifact-server: this is whole-snapshot,
-      # not per-object, so every run re-uploads/downloads the full
-      # cache rather than just the changed elements. Fine to start;
-      # revisit (e.g. Oracle Cloud Always Free running
-      # bst-artifact-server) once the snapshot is big enough that
-      # transfer time, not build time, is the bottleneck.
+      - name: track missing source refs
+        run: |
+          bst source track --all
+
+      - name: commit tracked refs (if needed)
+        run: |
+          git config user.name "buildstream-bot"
+          git config user.email "buildstream@flucidos.local"
+          if git diff --quiet; then
+            echo "No changes to commit"
+          else
+            git add elements/
+            git commit -m "chore: track missing source refs"
+            git push origin HEAD:${{ github.head_ref }}
+          fi
+        if: github.event_name == 'pull_request'
+
       - name: build bootstrap toolchain
         run: just build
 
