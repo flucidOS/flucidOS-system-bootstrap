@@ -17,6 +17,7 @@ build-depends:
 - tools/sysroot-setup.bst
 
 variables:
+  bootstrap-triplet: "%{target_arch}-flucidos-linux-gnu"
   build-dir: build
   conf-cmd: "%{build-root}/libstdc++-v3/configure"
   gcc-version: $(%{bootstrap-triplet}-gcc -dumpversion)
