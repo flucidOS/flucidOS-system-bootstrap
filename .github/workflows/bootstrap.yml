@@ -50,7 +50,7 @@ jobs:
         run: |
           python3 -m venv "$HOME/.bst-venv"
           "$HOME/.bst-venv/bin/pip" install --upgrade pip
-          "$HOME/.bst-venv/bin/pip" install buildstream buildstream-plugins
+          "$HOME/.bst-venv/bin/pip" install dulwich buildstream buildstream-plugins
           echo "$HOME/.bst-venv/bin" >> "$GITHUB_PATH"
 
       - uses: oras-project/setup-oras@v1
@@ -92,7 +92,7 @@ jobs:
           tar -C ~/.cache/buildstream -cf - . | zstd -T0 -o /tmp/cache.tar.zst
           echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u ${{ github.actor }} --password-stdin
           oras push "ghcr.io/$OWNER/flucidos-bootstrap-cache:latest" \
-            /tmp/cache.tar.zst:application/octet-stream
+            /tmp/cache.tar.zst:application/octet-stream --disable-path-validation
 
       - name: checkout bootstrap rootfs
         run: bst artifact checkout all.bst --directory ./bootstrap-root
