@@ -37,39 +37,53 @@ jobs:
 
       - uses: oras-project/setup-oras@v1
 
-      - name: clear buildstream cache for fresh build
+      - name: restore buildstream cache from GHCR (if available)
         run: |
-          rm -rf ~/.cache/buildstream
-
-      - name: track missing source refs
-        run: |
-          bst source track -d all
-
-      - name: commit tracked refs (if needed)
-        run: |
-          git config user.name "buildstream-bot"
-          git config user.email "buildstream@flucidos.local"
-          if git diff --quiet; then
-            echo "No changes to commit"
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          mkdir -p /tmp/cache-restore
+          echo "Attempting to restore cache from ghcr.io/$OWNER/flucidos-bootstrap-cache:latest"
+          oras pull "ghcr.io/$OWNER/flucidos-bootstrap-cache:latest" \
+            -o /tmp/cache-restore 2>/dev/null || echo "Cache not found or inaccessible, proceeding with fresh build"
+          if [ -f /tmp/cache-restore/cache.tar.zst ]; then
+            echo "Cache found, extracting..."
+            mkdir -p ~/.cache/buildstream
+            zstd -d /tmp/cache-restore/cache.tar.zst -c | tar -C ~/.cache/buildstream -xf -
+            echo "Cache restored successfully"
           else
-            git add elements/
-            git commit -m "chore: track missing source refs"
-            git push origin HEAD:${{ github.head_ref }}
+            echo "No cache file found, starting fresh build"
           fi
-        if: github.event_name == 'pull_request'
 
-      - name: build bootstrap toolchain
-        run: just build
+      - name: build bootstrap toolchain (with network retries)
+        run: |
+          set +e
+          for attempt in 1 2 3; do
+            echo "Build attempt $attempt/3"
+            just build
+            result=$?
+            if [ $result -eq 0 ]; then
+              echo "Build succeeded on attempt $attempt"
+              exit 0
+            fi
+            if [ $attempt -lt 3 ]; then
+              echo "Build failed on attempt $attempt, waiting 60 seconds before retry..."
+              sleep 60
+            fi
+          done
+          echo "Build failed after 3 attempts"
+          exit 1
 
       - name: snapshot buildstream cache to GHCR
         if: success()
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           mkdir -p /tmp/cache-snapshot
+          echo "Creating cache snapshot..."
           tar -C ~/.cache/buildstream -cf - . | zstd -T0 -o /tmp/cache-snapshot/cache.tar.zst
+          echo "Uploading cache to GHCR..."
           echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u ${{ github.actor }} --password-stdin
           oras push "ghcr.io/$OWNER/flucidos-bootstrap-cache:latest" \
             /tmp/cache-snapshot/cache.tar.zst:application/octet-stream --disable-path-validation
+          echo "Cache uploaded successfully"
 
       - name: checkout bootstrap rootfs
         run: bst artifact checkout all.bst --directory ./bootstrap-root
