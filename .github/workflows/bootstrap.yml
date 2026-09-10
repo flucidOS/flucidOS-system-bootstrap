@@ -21,7 +21,7 @@ jobs:
       - name: install sandboxing deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y bubblewrap just zstd
+          sudo apt-get install -y bubblewrap just zstd lzip
 
       # GOTCHA 1: BuildStream's sandbox is bubblewrap. Ubuntu 24.04's
       # AppArmor policy blocks unprivileged user namespaces by default —
