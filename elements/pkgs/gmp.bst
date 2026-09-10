@@ -16,11 +16,12 @@ build-depends:
 - pkgs/linux-api-headers.bst
 - tools/sysroot-setup.bst
 
+variables:
+  bootstrap-triplet: "%{target_arch}-flucidos-linux-gnu"
+  build-dir: build
+  conf-local: --enable-cxx --disable-static
+
 environment:
   CC: "%{bootstrap-triplet}-gcc"
   AR: "%{bootstrap-triplet}-ar"
   RANLIB: "%{bootstrap-triplet}-ranlib"
-
-variables:
-  build-dir: build
-  conf-local: --enable-cxx --disable-static
