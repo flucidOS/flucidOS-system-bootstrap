@@ -50,7 +50,7 @@ jobs:
         run: |
           python3 -m venv "$HOME/.bst-venv"
           "$HOME/.bst-venv/bin/pip" install --upgrade pip
-          "$HOME/.bst-venv/bin/pip" install dulwich buildstream buildstream-plugins
+          "$HOME/.bst-venv/bin/pip" install dulwich requests buildstream buildstream-plugins
           echo "$HOME/.bst-venv/bin" >> "$GITHUB_PATH"
 
       - uses: oras-project/setup-oras@v1
