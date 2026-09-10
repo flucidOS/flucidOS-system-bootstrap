@@ -43,7 +43,7 @@ jobs:
 
       - name: track missing source refs
         run: |
-          bst source track --all
+          bst source track -d all
 
       - name: commit tracked refs (if needed)
         run: |
