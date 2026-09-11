@@ -103,13 +103,6 @@ jobs:
               bst --colors --no-interactive build tools/test.bst
             '
 
-      - name: Reclaim ownership of the BuildStream cache
-        if: always()
-        run: |
-          # The container wrote into $HOME/bst-cache as root; the cache
-          # scripts run as the normal runner user afterwards.
-          sudo chown -R "$(id -u)":"$(id -g)" "$HOME/bst-cache"
-
       - name: Save BuildStream caches
         if: always()
         env:
@@ -134,9 +127,6 @@ jobs:
               bst --no-strict artifact checkout -d none --no-integrate \
                 adjusted.bst --directory result/
             '
-          # The container ran as root; hand the checkout back to the runner
-          # user so later steps (and the upload action) can read it freely.
-          sudo chown -R "$(id -u)":"$(id -g)" result/
 
       - name: Upload bootstrap artifact
         if: success()
