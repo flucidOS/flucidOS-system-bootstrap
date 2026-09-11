@@ -1,5 +1,6 @@
 kind: stack
-description: FlucidOS API - Toolchain linked against final OS libs
+description: This is the bootstrap, configured to produce executables that link against final system's libraries
 
 depends:
-- unadjusted.bst
+- pkgs/fs.bst
+- tools/adjusted-paths.bst

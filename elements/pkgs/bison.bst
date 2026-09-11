@@ -1,13 +1,14 @@
 kind: autotools
 
-description: bison (after native toolchain – carbonOS)
-
 sources:
-- kind: tar
-  url: github:flucidOS/pkg-src/releases/download/cache-core/bison.tar.xz
+- kind: gnu
+  name: bison
 
 build-depends:
 - tools/toolchain.bst
 
-variables:
-  conf-local: --disable-nls
+# Fix the yacc command
+config:
+  install-commands:
+    (>):
+    - sed -i 's@/bin/sh@%{bindir}/sh@' %{install-root}%{bindir}/yacc

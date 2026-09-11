@@ -1,12 +1,6 @@
 kind: stack
-description: FlucidOS API - Toolchain linked against bootstrap libs
+description: This is the bootstrap, configured to produce executables that link against toolchain's libraries
 
 depends:
-- pkgs/linux-api-headers.bst
-- pkgs/glibc.bst
-- pkgs/binutils.bst
-- pkgs/gcc.bst
-- pkgs/bash.bst
-- pkgs/coreutils.bst
-- pkgs/make.bst
-- pkgs/tar.bst
+- pkgs/fs.bst
+- all.bst

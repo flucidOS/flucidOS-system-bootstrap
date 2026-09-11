@@ -1,13 +1,11 @@
 kind: autotools
 
-description: tar (after native toolchain – carbonOS)
-
 sources:
-- kind: tar
-  url: github:flucidOS/pkg-src/releases/download/cache-core/tar.tar.xz
+- kind: gnu
+  name: tar
 
 build-depends:
 - tools/toolchain.bst
 
-variables:
-  conf-local: --disable-nls
+environment:
+  FORCE_UNSAFE_CONFIGURE: "1"

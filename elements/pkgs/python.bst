@@ -1,14 +1,25 @@
 kind: autotools
 
-description: CPython (after native toolchain)
-
 sources:
-- kind: tar
-  url: github:flucidOS/pkg-src/releases/download/cache-core/python.tar.xz
+- kind: git_tag
+  url: github:python/cpython.git
+  track: '3.10'
+  exclude:
+  - v*rc*
+  - v*a*
+# release-monitoring: 13254
+
+depends:
+- pkgs/ncurses.bst
 
 build-depends:
 - tools/toolchain.bst
 
 variables:
-  build-dir: build
-  conf-local: --without-ensurepip --disable-shared
+  conf-local: >-
+    --without-ensurepip
+
+config:
+  configure-commands: # Python hardcodes /usr. Fix that
+    (<):
+    - sed -i '/def add_multiarch_paths/a \        return' setup.py

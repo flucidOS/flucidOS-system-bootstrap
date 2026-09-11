@@ -1,16 +1,53 @@
-# justfile for flucidOS-system-bootstrap
+_default: help
 
-build:
-	bst build all.bst
+# Build the bootstrap module (alias: b)
+@build:
+    bst build adjusted.bst
 
-unadjusted:
-	bst build unadjusted.bst
+[private]
+alias b := build
 
-adjusted:
-	bst build adjusted.bst
+@_untrack:
+    [ -f ./project.refs ] && rm ./project.refs || true
+    [ -f ./junction.refs ] && rm ./junction.refs || true
 
-track:
-	bst track --all
+# Manually update packages, then track everything (alias: up)
+@update: _untrack && track
+    tools/manual-updates
 
-shell pkg:
-	bst shell --build pkgs/{{pkg}}.bst
+[private]
+alias up := update
+
+# Track all packages
+@track: _untrack
+    bst source track bst-plugins.bst
+    bst source track bst-plugins-experimental.bst
+    bst source track freedesktop-sdk.bst
+    bst source track -d all all.bst
+
+# Check out a built bst element
+@checkout ELEMENT:
+    [ -d result ] && rm -rf result/
+    bst --no-strict artifact checkout -d none --no-integrate {{ELEMENT}} --directory result/
+
+# Run the toolchain smoke test
+@test:
+    bst build tools/test.bst
+
+# Restore BuildStream's local caches from GHCR (see scripts/bst-cache.sh).
+# Requires GHCR_CACHE_REPO/CACHE_TAG env vars and an `oras login ghcr.io` already done.
+@cache-restore:
+    ./scripts/bst-cache.sh restore sources
+    ./scripts/bst-cache.sh restore cas
+
+# Snapshot BuildStream's local caches and push them to GHCR
+@cache-save:
+    ./scripts/bst-cache.sh save sources
+    ./scripts/bst-cache.sh save cas
+
+# Show this help document
+@help:
+    echo "flucidOS Bootstrap Build System"
+    echo "USAGE: just RECIPE [ARGS...]"    
+    echo
+    just -lu

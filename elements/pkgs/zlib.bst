@@ -1,15 +1,19 @@
 kind: autotools
-
-description: zlib (after native toolchain – carbonOS)
+description: Contains various compression/decompression routines
 
 sources:
-- kind: tar
-  url: github:flucidOS/pkg-src/releases/download/cache-core/zlib.tar.xz
+- kind: git_tag
+  url: github:madler/zlib
+
+depends:
+- pkgs/glibc.bst
 
 build-depends:
 - tools/toolchain.bst
 
+# zlib's configure is very picky...
 variables:
-  conf-cmd: "%{conf-root}/configure"
-  conf-local: ""
-  build-dir: "."
+  conf-args: >-
+    --prefix=%{prefix}
+    --libdir=%{libdir}
+    --sharedlibdir=%{libdir}

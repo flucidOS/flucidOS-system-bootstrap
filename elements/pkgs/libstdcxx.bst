@@ -1,12 +1,9 @@
 kind: autotools
-
-description: |
-  Temporary libstdc++ from gcc sources (carbonOS). Built with cross compiler.
-  Must NOT depend on tools/toolchain.bst.
+description: A temporary libstdc++ used to build a final bootstrap gcc
 
 sources:
-- kind: tar
-  url: github:flucidOS/pkg-src/releases/download/cache-core/gcc.tar.xz
+- kind: gnu
+  name: gcc
 
 build-depends:
 - tools/import-fdo.bst
@@ -17,9 +14,8 @@ build-depends:
 - tools/sysroot-setup.bst
 
 variables:
-  bootstrap-triplet: "%{target_arch}-flucidos-linux-gnu"
   build-dir: build
-  conf-cmd: "%{build-root}/libstdc++-v3/configure"
+  conf-cmd: '%{build-root}/libstdc++-v3/configure'
   gcc-version: $(%{bootstrap-triplet}-gcc -dumpversion)
   conf-local: >-
     --host=%{bootstrap-triplet}

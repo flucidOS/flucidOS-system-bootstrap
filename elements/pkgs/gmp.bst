@@ -1,12 +1,8 @@
 kind: autotools
 
-description: |
-  GMP with cross compiler after bootstrap glibc (carbonOS mid-stage).
-  Must NOT depend on tools/toolchain.bst (would cycle with final gcc).
-
 sources:
-- kind: tar
-  url: github:flucidOS/pkg-src/releases/download/cache-core/gmp.tar.xz
+- kind: gnu
+  name: gmp
 
 build-depends:
 - tools/import-fdo.bst
@@ -16,12 +12,10 @@ build-depends:
 - pkgs/linux-api-headers.bst
 - tools/sysroot-setup.bst
 
-variables:
-  bootstrap-triplet: "%{target_arch}-flucidos-linux-gnu"
-  build-dir: build
-  conf-local: --enable-cxx --disable-static
-
 environment:
   CC: "%{bootstrap-triplet}-gcc"
   AR: "%{bootstrap-triplet}-ar"
   RANLIB: "%{bootstrap-triplet}-ranlib"
+
+variables:
+  build-dir: build

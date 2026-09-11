@@ -1,13 +1,8 @@
 kind: autotools
 
-description: file (after native toolchain – carbonOS)
-
 sources:
-- kind: tar
-  url: github:flucidOS/pkg-src/releases/download/cache-core/file.tar.xz
+- kind: git_tag
+  url: github:file/file.git
 
 build-depends:
 - tools/toolchain.bst
-
-variables:
-  conf-local: --disable-nls

@@ -1,5 +1,9 @@
 kind: stack
-description: Import the Freedesktop SDK base host toolchain
 
 depends:
-- filename: freedesktop-sdk.bst:bootstrap-import.bst
+- freedesktop-sdk.bst:public-stacks/buildsystem-autotools.bst
+- freedesktop-sdk.bst:components/bison.bst
+- freedesktop-sdk.bst:components/gzip.bst
+- freedesktop-sdk.bst:components/patch.bst
+- freedesktop-sdk.bst:components/python3.bst
+- freedesktop-sdk.bst:components/tar.bst

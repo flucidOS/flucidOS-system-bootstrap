@@ -1,13 +1,14 @@
 kind: script
-description: Prepare the FlucidOS isolated sysroot
+description: |
+  Installs a compatability symlink for the sysroot
+
+  See: http://www.linuxfromscratch.org/lfs/view/stable-systemd/chapter04/creatingtoolsdir.html
 
 build-depends:
 - tools/import-fdo.bst
 
 config:
   commands:
-  - mkdir -p "%{sysroot}/usr/include"
-  - mkdir -p "%{sysroot}/usr/lib"
-  - mkdir -p "%{tools}/bin"
-  - ln -sfv usr/lib "%{sysroot}/lib"
-  - ln -sfv usr/lib "%{sysroot}/lib64"
+  - |
+    mkdir -pv %{install-root}%{bootstrap-sysroot}
+    ln -sv %{prefix} %{install-root}%{bootstrap-sysroot}%{prefix}

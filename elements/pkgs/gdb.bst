@@ -1,14 +1,27 @@
 kind: autotools
-
-description: GDB (optional late package)
+description: Minimal build of GDB, for gdb-add-index
 
 sources:
-- kind: tar
-  url: github:flucidOS/pkg-src/releases/download/cache-core/gdb.tar.xz
+- kind: gnu
+  name: gdb
+
+depends:
+- pkgs/zlib.bst
+- pkgs/xz.bst
+- pkgs/gmp.bst
 
 build-depends:
 - tools/toolchain.bst
 
 variables:
-  build-dir: build
-  conf-local: --disable-nls --with-system-zlib
+  build-dir: "_builddir"
+  conf-local: >-
+    --with-separate-debug-dir="%{debugdir}"
+  make-args: MAKEINFO=true
+
+config:
+  install-commands:
+  - |
+    cd %{build-dir}
+    make -C gdb -j1 DESTDIR="%{install-root}" install
+
