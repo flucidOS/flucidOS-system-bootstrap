@@ -18,23 +18,23 @@
 # and the content-addressable store of built artifacts).
 #
 # Required environment:
-#   GHCR_CACHE_REPO   Base OCI repo, e.g. ghcr.io/owner/repo/bst-cache
-#                     (must already be lowercase -- GHCR requires this).
-#                     The subdir is appended as a suffix, e.g.
-#                     ghcr.io/owner/repo/bst-cache-sources
-#   CACHE_TAG         Tag to save under / prefer when restoring
-#                     (e.g. a sanitized branch name).
+#   GHCR_CACHE_REPO     Base OCI repo, e.g. ghcr.io/owner/repo/bst-cache
+#                       (must already be lowercase -- GHCR requires this).
+#                       The subdir is appended as a suffix, e.g.
+#                       ghcr.io/owner/repo/bst-cache-sources
+#   CACHE_TAG           Tag to save under / prefer when restoring
+#                       (e.g. a sanitized branch name).
 #
 # Optional environment:
-#   FALLBACK_TAG      Tag to fall back to on restore if CACHE_TAG isn't found
-#                     yet (default: "main"). Mirrors actions/cache's
-#                     restore-keys behaviour.
-#   BST_CACHE_DIR     Base cache directory (default: "$HOME/bst-cache").
-#                     This is expected to be bind-mounted into the
-#                     BuildStream container at ~/.cache/buildstream.
-#   ZSTD_ARGS         Compression args passed to zstd (default: "-T0 -3",
-#                     i.e. fast, multi-threaded, low compression -- CI time
-#                     usually matters more than a few % of archive size).
+#   FALLBACK_TAG        Tag to fall back to on restore if CACHE_TAG isn't found
+#                       yet (default: "main"). Mirrors actions/cache's
+#                       restore-keys behaviour.
+#   BST_CACHE_DIR       Base cache directory (default: "$HOME/bst-cache").
+#                       This is expected to be bind-mounted into the
+#                       BuildStream container at ~/.cache/buildstream.
+#   ZSTD_ARGS           Compression args passed to zstd (default: "-T0 -3",
+#                       i.e. fast, multi-threaded, low compression -- CI time
+#                       usually matters more than a few % of archive size).
 #
 set -euo pipefail
 
@@ -126,9 +126,11 @@ do_save() {
     -I "zstd ${ZSTD_ARGS}" -cpf "$archive" -C "$TARGET_DIR" .
 
   log "pushing snapshot to ${REPO}:${CACHE_TAG} ($(du -h "$archive" | cut -f1))"
-    oras push --disable-path-validation "${REPO}:${CACHE_TAG}" \
-      --artifact-type "$MEDIA_TYPE" \
-      "$archive"
+  
+  # Added --disable-path-validation to bypass ORAS v1.2.0 absolute path restrictions
+  oras push --disable-path-validation "${REPO}:${CACHE_TAG}" \
+    --artifact-type "$MEDIA_TYPE" \
+    "$archive"
 
   rm -rf "$workdir"
 }

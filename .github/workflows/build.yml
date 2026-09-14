@@ -27,6 +27,26 @@ jobs:
           docker-images: true
           swap-storage: false
 
+      - name: Fix Bubblewrap Permissions
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Configure BuildStream & Install
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-venv bubblewrap git tar zstd curl
+          python3 -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install "buildstream==2.8.0" "dulwich<0.22.0"
+          
+          mkdir -p ~/.config
+          cat <<EOF > ~/.config/buildstream.conf
+          cachedir: ${HOME}/bst-cache
+          cache:
+            quota: infinity
+            pull-buildtrees: False
+            cache-buildtrees: never
+          EOF
+
       - name: Install ORAS & Login
         run: |
           curl -LO "https://github.com/oras-project/oras/releases/download/v1.2.0/oras_1.2.0_linux_amd64.tar.gz"
@@ -51,33 +71,18 @@ jobs:
           ./scripts/bst-cache.sh restore sources
           ./scripts/bst-cache.sh restore cas
 
-      - name: Pull BuildStream image
-        run: docker pull docker.io/buildstream/buildstream:latest
-
       - name: Track & build adjusted.bst
         run: |
-          docker run --privileged --rm \
-            -v "$PWD":/repo -w /repo \
-            -v "$HOME/bst-cache":/root/.cache/buildstream \
-            docker.io/buildstream/buildstream:latest \
-            bash -c "bst source track adjusted.bst && bst build adjusted.bst"
+          .venv/bin/bst source track adjusted.bst
+          .venv/bin/bst build adjusted.bst
 
       - name: Run toolchain smoke test
-        run: |
-          docker run --privileged --rm \
-            -v "$PWD":/repo -w /repo \
-            -v "$HOME/bst-cache":/root/.cache/buildstream \
-            docker.io/buildstream/buildstream:latest \
-            bst build tools/test.bst
+        run: .venv/bin/bst build tools/test.bst
 
       - name: Check out result
         run: |
           rm -rf result
-          docker run --privileged --rm \
-            -v "$PWD":/repo -w /repo \
-            -v "$HOME/bst-cache":/root/.cache/buildstream \
-            docker.io/buildstream/buildstream:latest \
-            bst --no-strict artifact checkout -d none --no-integrate adjusted.bst --directory result/
+          .venv/bin/bst --no-strict artifact checkout -d none --no-integrate adjusted.bst --directory result/
 
       - name: Upload result artifact
         uses: actions/upload-artifact@v4
