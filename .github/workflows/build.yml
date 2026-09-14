@@ -8,7 +8,10 @@ on:
 jobs:
   build-os:
     runs-on: ubuntu-24.04
-    
+    permissions:
+      packages: write
+      contents: read
+      
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -30,30 +33,47 @@ jobs:
       - name: Install BuildStream
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip python3-venv bubblewrap git
+          sudo apt-get install -y python3-pip python3-venv bubblewrap git tar zstd curl
           python3 -m venv .venv
-          .venv/bin/pip install buildstream
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install "buildstream==2.8.0"
+          .venv/bin/bst --version
 
       - name: Configure BuildStream Cache Rules
         run: |
           mkdir -p ~/.config
           cat <<EOF > ~/.config/buildstream.conf
           cache:
-            quota: system
+            quota: infinity
             pull-buildtrees: False
             cache-buildtrees: never
           EOF
 
-      - name: Restore BuildStream Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/buildstream
-          key: bst-cache-${{ github.sha }}
-          restore-keys: |
-            bst-cache-
+      - name: Install ORAS & Login
+        run: |
+          curl -LO "https://github.com/oras-project/oras/releases/download/v1.2.0/oras_1.2.0_linux_amd64.tar.gz"
+          mkdir -p oras-install
+          tar -zxf oras_1.2.0_linux_amd64.tar.gz -C oras-install
+          sudo mv oras-install/oras /usr/local/bin/
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Restore Cache from GHCR
+        run: |
+          oras pull ghcr.io/${{ github.repository }}/bst-cache:latest || echo "No existing cache found."
+          if [ -f bst-cache.tar.zst ]; then
+            tar -I zstd -xf bst-cache.tar.zst -C ~/
+          fi
 
       - name: Track Sources
         run: .venv/bin/bst source track all.bst
 
-      - name: Build flucidOS
+      - name: Build flucidOS-Bootstrap
         run: .venv/bin/bst build all.bst
+
+      - name: Save Cache to GHCR
+        if: always()
+        run: |
+          if [ -d ~/.cache/buildstream ]; then
+            tar -I zstd -cf bst-cache.tar.zst -C ~/ .cache/buildstream
+            oras push ghcr.io/${{ github.repository }}/bst-cache:latest bst-cache.tar.zst
+          fi
