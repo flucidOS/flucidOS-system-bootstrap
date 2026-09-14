@@ -126,9 +126,9 @@ do_save() {
     -I "zstd ${ZSTD_ARGS}" -cpf "$archive" -C "$TARGET_DIR" .
 
   log "pushing snapshot to ${REPO}:${CACHE_TAG} ($(du -h "$archive" | cut -f1))"
-  oras push "${REPO}:${CACHE_TAG}" \
-    --artifact-type "$MEDIA_TYPE" \
-    "$archive"
+    oras push --disable-path-validation "${REPO}:${CACHE_TAG}" \
+      --artifact-type "$MEDIA_TYPE" \
+      "$archive"
 
   rm -rf "$workdir"
 }
