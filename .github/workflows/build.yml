@@ -1,0 +1,53 @@
+name: Bootstrap flucidOS Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # Allows you to trigger the build manually from the GitHub UI
+
+jobs:
+  build-os:
+    runs-on: ubuntu-24.04
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Maximize Build Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # This aggressively wipes unused pre-installed software to reclaim ~30-40GB of space
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+
+      - name: Fix Bubblewrap Permissions (Ubuntu 24.04)
+        run: |
+          # Bypasses the same AppArmor restriction we hit on your local machine
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Install BuildStream and Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip pipx bubblewrap git
+          pipx install buildstream
+
+      - name: Configure BuildStream Cache Rules
+        run: |
+          mkdir -p ~/.config
+          cat <<EOF > ~/.config/buildstream.conf
+          cache:
+            quota: system
+            pull-buildtrees: False
+            cache-buildtrees: never
+          EOF
+
+      - name: Track Sources (Refresh CAS)
+        run: ~/.local/bin/bst source track all.bst
+
+      - name: Build flucidOS Blueprint
+        run: ~/.local/bin/bst build all.bst

@@ -5,11 +5,6 @@ sources:
   url: sourceware:debugedit.git
   track: main
 
-# TODO: Remove once debugedit merges our patch
-# https://sourceware.org/pipermail/debugedit/2022-June/000155.html
-- kind: patch
-  path: patches/debugedit/no-rpm-env.patch
-
 depends:
 - pkgs/glibc.bst
 - pkgs/elfutils.bst

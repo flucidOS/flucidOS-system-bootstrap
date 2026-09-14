@@ -5,4 +5,4 @@ projects:
     bst-plugins-experimental.bst:
     - ref: f75cc11f1d345db09db4cb5b88e403c56587a3b3
     freedesktop-sdk.bst:
-    - ref: freedesktop-sdk-23.08beta.6-0-g9585b7f4c8f5a1a8cc2208b301930a4956c1b467
+    - ref: 538fc30c46fc5968570f0cd5039f8f61b1100fb5
