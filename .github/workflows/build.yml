@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-os:
+  build-Bootstrap:
     runs-on: ubuntu-24.04
     permissions:
       packages: write
@@ -36,7 +36,8 @@ jobs:
           sudo apt-get install -y python3-pip python3-venv bubblewrap git tar zstd curl
           python3 -m venv .venv
           .venv/bin/pip install --upgrade pip
-          .venv/bin/pip install "buildstream==2.8.0"
+          # Added dulwich to satisfy git_repo plugin requirements
+          .venv/bin/pip install "buildstream==2.8.0" dulwich
           .venv/bin/bst --version
 
       - name: Configure BuildStream Cache Rules
@@ -59,7 +60,10 @@ jobs:
 
       - name: Restore Cache from GHCR
         run: |
-          oras pull ghcr.io/${{ github.repository }}/bst-cache:latest || echo "No existing cache found."
+          # Convert repository name to strict lowercase for OCI compliance
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          oras pull ghcr.io/${REPO_LOWER}/bst-cache:latest || echo "No existing cache found."
+          
           if [ -f bst-cache.tar.zst ]; then
             tar -I zstd -xf bst-cache.tar.zst -C ~/
           fi
@@ -67,13 +71,14 @@ jobs:
       - name: Track Sources
         run: .venv/bin/bst source track all.bst
 
-      - name: Build flucidOS-Bootstrap
+      - name: Build flucidOS-bootstrap
         run: .venv/bin/bst build all.bst
 
       - name: Save Cache to GHCR
         if: always()
         run: |
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           if [ -d ~/.cache/buildstream ]; then
             tar -I zstd -cf bst-cache.tar.zst -C ~/ .cache/buildstream
-            oras push ghcr.io/${{ github.repository }}/bst-cache:latest bst-cache.tar.zst
+            oras push ghcr.io/${REPO_LOWER}/bst-cache:latest bst-cache.tar.zst
           fi
