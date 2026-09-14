@@ -1,0 +1,64 @@
+stages:
+  - build
+
+build-os:
+  stage: build
+  
+  # This routes the job to your specific self-hosted machine
+  tags:
+    - flucidos-bootstrap-builder
+
+  variables:
+    DEBIAN_FRONTEND: noninteractive
+
+  before_script:
+    # 1. Install dependencies natively on the runner
+    - sudo apt-get update
+    - sudo apt-get install -y python3-pip python3-venv bubblewrap git tar zstd curl
+    
+    # 2. Setup Native Python Environment & Pin Dependencies
+    - python3 -m venv .venv
+    - .venv/bin/pip install --upgrade pip
+    - .venv/bin/pip install "buildstream==2.8.0" "dulwich<0.22.0"
+    
+    # 3. Configure BuildStream (No Quota limits)
+    - mkdir -p ~/.config
+    - |
+      cat <<EOF > ~/.config/buildstream.conf
+      cachedir: ${CI_PROJECT_DIR}/bst-cache
+      cache:
+        quota: infinity
+        pull-buildtrees: False
+        cache-buildtrees: never
+      EOF
+      
+    # 4. Install ORAS & Authenticate using GitLab's native Ephemeral Token
+    - curl -LO "https://github.com/oras-project/oras/releases/download/v1.2.0/oras_1.2.0_linux_amd64.tar.gz"
+    - mkdir -p oras-install
+    - tar -zxf oras_1.2.0_linux_amd64.tar.gz -C oras-install
+    - sudo mv oras-install/oras /usr/local/bin/
+    - echo "$CI_JOB_TOKEN" | oras login "$CI_REGISTRY" -u gitlab-ci-token --password-stdin
+
+  script:
+    # 5. Map GitLab CI variables to your custom bst-cache.sh script
+    - export GHCR_CACHE_REPO="${CI_REGISTRY_IMAGE}/bst-cache"
+    - export CACHE_TAG="${CI_COMMIT_REF_SLUG}"
+    - export BST_CACHE_DIR="${CI_PROJECT_DIR}/bst-cache"
+    
+    # 6. Restore the cache from GitLab Container Registry
+    - ./scripts/bst-cache.sh restore sources || echo "No sources cache found"
+    - ./scripts/bst-cache.sh restore cas || echo "No cas cache found"
+    
+    # 7. Execute BuildStream
+    - .venv/bin/bst source track all.bst
+    - .venv/bin/bst build all.bst
+
+  after_script:
+    # GitLab's after_script runs in a fresh shell, so we must re-export variables
+    - export GHCR_CACHE_REPO="${CI_REGISTRY_IMAGE}/bst-cache"
+    - export CACHE_TAG="${CI_COMMIT_REF_SLUG}"
+    - export BST_CACHE_DIR="${CI_PROJECT_DIR}/bst-cache"
+    
+    # 8. Compress and Push Cache via ORAS
+    - ./scripts/bst-cache.sh save sources
+    - ./scripts/bst-cache.sh save cas
