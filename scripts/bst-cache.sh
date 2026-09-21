@@ -126,8 +126,15 @@ do_save() {
 
   log "snapshotting ${TARGET_DIR}"
   # -I (not --zstd) so we can pass custom zstd args like -T0 for threading.
-  tar --exclude='./tmp' --exclude='./logs' \
-    -I "zstd ${ZSTD_ARGS}" -cpf "$archive" -C "$TARGET_DIR" .
+  # Skip transient dirs. GNU tar exits 1 for "file changed as we read it",
+  # which is harmless here; only exit codes > 1 are real failures.
+  local rc=0
+  tar --exclude='./tmp' --exclude='./logs' --exclude='./staging' \
+    -I "zstd ${ZSTD_ARGS}" -cpf "$archive" -C "$TARGET_DIR" . || rc=$?
+  if (( rc > 1 )); then
+    log "tar failed with exit code ${rc}"
+    return "$rc"
+  fi
 
   log "pushing snapshot to ${REPO}:${CACHE_TAG} ($(du -h "$archive" | cut -f1))"
   

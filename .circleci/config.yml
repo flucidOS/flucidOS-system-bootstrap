@@ -36,6 +36,7 @@ jobs:
             mkdir -p ~/.config
             printf '%s\n' \
               "cachedir: ${HOME}/bst-cache" \
+              "sourcedir: ${HOME}/bst-cache/sources" \
               "build:" \
               "  max-jobs: 2" \
               "scheduler:" \
@@ -78,6 +79,9 @@ jobs:
           when: always
           no_output_timeout: 30m
           command: |
+            pkill -x bwrap || true
+            pkill -f buildbox-casd || true
+            sleep 5
             ./scripts/bst-cache.sh save sources
             ./scripts/bst-cache.sh save cas
             ./scripts/bst-cache.sh save artifacts
