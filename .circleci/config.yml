@@ -30,16 +30,16 @@ jobs:
           name: Configure BuildStream (Throttled for RAM)
           command: |
             mkdir -p ~/.config
-            cat << 'BST_EOF' > ~/.config/buildstream.conf
-            cachedir: ${HOME}/bst-cache
-            build:
-              max-jobs: 2
-              builders: 2
-            cache:
-              quota: infinity
-              pull-buildtrees: False
-              cache-buildtrees: never
-            BST_EOF
+            printf '%s\n' \
+              "cachedir: ${HOME}/bst-cache" \
+              "build:" \
+              "  max-jobs: 2" \
+              "  builders: 2" \
+              "cache:" \
+              "  quota: infinity" \
+              "  pull-buildtrees: False" \
+              "  cache-buildtrees: never" \
+              > ~/.config/buildstream.conf
 
       - run:
           name: Build flucidOS
