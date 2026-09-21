@@ -68,6 +68,7 @@ jobs:
 
       - run:
           name: Build flucidOS
+          no_output_timeout: 60m
           command: |
             .venv/bin/bst source track adjusted.bst
             timeout -k 120 "${BST_BUILD_MINUTES}m" bash -c '.venv/bin/bst build adjusted.bst && .venv/bin/bst build tools/test.bst'
