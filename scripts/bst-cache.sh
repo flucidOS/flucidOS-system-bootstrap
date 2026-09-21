@@ -74,7 +74,11 @@ pull_tag() {
   workdir="$(mktemp -d)"
 
   log "found ${REPO}:${tag}, restoring into ${TARGET_DIR}"
-  oras pull "${REPO}:${tag}" -o "$workdir"
+  if ! oras pull "${REPO}:${tag}" -o "$workdir"; then
+    log "oras pull failed for ${REPO}:${tag}"
+    rm -rf "$workdir"
+    return 1
+  fi
 
   local archive
   archive="$(find "$workdir" -maxdepth 1 -type f | head -n1)"
@@ -127,10 +131,11 @@ do_save() {
 
   log "pushing snapshot to ${REPO}:${CACHE_TAG} ($(du -h "$archive" | cut -f1))"
   
-  # Added --disable-path-validation to bypass ORAS v1.2.0 absolute path restrictions
-  oras push --disable-path-validation "${REPO}:${CACHE_TAG}" \
+  # Push from inside the workdir with a relative filename so the layer title is
+  # just "<subdir>.tar.zst". An absolute title can't be pulled into a fresh dir.
+  (cd "$workdir" && oras push "${REPO}:${CACHE_TAG}" \
     --artifact-type "$MEDIA_TYPE" \
-    "$archive"
+    "$(basename "$archive")")
 
   rm -rf "$workdir"
 }
