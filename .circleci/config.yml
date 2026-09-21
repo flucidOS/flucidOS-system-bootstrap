@@ -4,7 +4,11 @@ jobs:
   build-os:
     machine:
       image: ubuntu-2204:current
-    resource_class: medium 
+    resource_class: medium
+    environment:
+      GHCR_CACHE_REPO: ghcr.io/flucidos/flucidos-system-bootstrap/bst-cache
+      FALLBACK_TAG: main
+      BST_BUILD_MINUTES: "35"
     steps:
       - checkout
 
@@ -43,12 +47,39 @@ jobs:
               > ~/.config/buildstream.conf
 
       - run:
+          name: Install ORAS and log in to GHCR
+          command: |
+            : "${GHCR_USER:?set GHCR_USER in CircleCI project env vars}"
+            : "${GHCR_TOKEN:?set GHCR_TOKEN in CircleCI project env vars}"
+            curl -fsSL -o oras.tar.gz https://github.com/oras-project/oras/releases/download/v1.2.0/oras_1.2.0_linux_amd64.tar.gz
+            mkdir -p oras-install
+            tar -zxf oras.tar.gz -C oras-install
+            sudo mv oras-install/oras /usr/local/bin/
+            echo "$GHCR_TOKEN" | oras login ghcr.io -u "$GHCR_USER" --password-stdin
+            printf 'export CACHE_TAG=%s\n' "$(printf '%s' "$CIRCLE_BRANCH" | tr -c 'a-zA-Z0-9._-' '-')" >> "$BASH_ENV"
+
+      - run:
+          name: Restore BuildStream caches
+          no_output_timeout: 30m
+          command: |
+            ./scripts/bst-cache.sh restore sources
+            ./scripts/bst-cache.sh restore cas
+            ./scripts/bst-cache.sh restore artifacts
+
+      - run:
           name: Build flucidOS
-          no_output_timeout: 120m
           command: |
             .venv/bin/bst source track adjusted.bst
-            .venv/bin/bst build adjusted.bst
-            .venv/bin/bst build tools/test.bst
+            timeout -k 120 "${BST_BUILD_MINUTES}m" bash -c '.venv/bin/bst build adjusted.bst && .venv/bin/bst build tools/test.bst'
+
+      - run:
+          name: Save BuildStream caches
+          when: always
+          no_output_timeout: 30m
+          command: |
+            ./scripts/bst-cache.sh save sources
+            ./scripts/bst-cache.sh save cas
+            ./scripts/bst-cache.sh save artifacts
 
       - run:
           name: Checkout Artifacts
