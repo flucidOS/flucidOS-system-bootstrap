@@ -1,10 +1,9 @@
 version: 2.1
 
 jobs:
-  build-os-bootstrap:
+  build-os:
     machine:
       image: ubuntu-2204:current
-    # The free tier 'medium' machine provides 4 vCPUs and 8GB RAM
     resource_class: medium 
     steps:
       - checkout
@@ -31,7 +30,7 @@ jobs:
           name: Configure BuildStream (Throttled for RAM)
           command: |
             mkdir -p ~/.config
-            cat <<EOF > ~/.config/buildstream.conf
+            cat << 'BST_EOF' > ~/.config/buildstream.conf
             cachedir: ${HOME}/bst-cache
             build:
               max-jobs: 2
@@ -40,11 +39,10 @@ jobs:
               quota: infinity
               pull-buildtrees: False
               cache-buildtrees: never
-            EOF
+            BST_EOF
 
       - run:
-          name: Build flucidOS Bootstrap
-          # CircleCI allows SSH debugging if a job fails, which is great for BuildStream
+          name: Build flucidOS
           command: |
             .venv/bin/bst source track adjusted.bst
             .venv/bin/bst build adjusted.bst
@@ -64,4 +62,4 @@ workflows:
   version: 2
   build-workflow:
     jobs:
-      - build-os-bootstrap
+      - build-os
