@@ -34,6 +34,7 @@ jobs:
               "cachedir: ${HOME}/bst-cache" \
               "build:" \
               "  max-jobs: 2" \
+              "scheduler:" \
               "  builders: 2" \
               "cache:" \
               "  quota: infinity" \
