@@ -16,11 +16,6 @@ variables:
     }
 
 config:
-  layout:
-  - element: unadjusted.bst
-    destination: /
-  - element: ''
-    destination: /build
   commands:
   # Test toolchain
   - |
