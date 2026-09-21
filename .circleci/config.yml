@@ -24,7 +24,7 @@ jobs:
             sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y python3-pip python3-venv bubblewrap git tar zstd curl
             python3 -m venv .venv
             .venv/bin/pip install --upgrade pip
-            .venv/bin/pip install "buildstream==2.8.0" "dulwich<0.22.0"
+            .venv/bin/pip install "buildstream==2.8.0" "dulwich<0.22.0" requests
 
       - run:
           name: Configure BuildStream (Throttled for RAM)
