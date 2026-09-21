@@ -43,7 +43,7 @@ jobs:
             EOF
 
       - run:
-          name: Build flucidOS
+          name: Build flucidOS Bootstrap
           # CircleCI allows SSH debugging if a job fails, which is great for BuildStream
           command: |
             .venv/bin/bst source track adjusted.bst
