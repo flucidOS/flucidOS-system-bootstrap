@@ -21,7 +21,7 @@ jobs:
           name: Install Dependencies
           command: |
             sudo apt-get update
-            sudo apt-get install -y python3-pip python3-venv bubblewrap git tar zstd curl
+            sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y python3-pip python3-venv bubblewrap git tar zstd curl
             python3 -m venv .venv
             .venv/bin/pip install --upgrade pip
             .venv/bin/pip install "buildstream==2.8.0" "dulwich<0.22.0"
@@ -43,6 +43,7 @@ jobs:
 
       - run:
           name: Build flucidOS
+          no_output_timeout: 120m
           command: |
             .venv/bin/bst source track adjusted.bst
             .venv/bin/bst build adjusted.bst
