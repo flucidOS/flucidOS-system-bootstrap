@@ -4,7 +4,7 @@ jobs:
   build-os:
     machine:
       image: ubuntu-2204:current
-    resource_class: xlarge
+    resource_class: large
     environment:
       GHCR_CACHE_REPO: ghcr.io/flucidos/flucidos-system-bootstrap/bst-cache
       FALLBACK_TAG: main
@@ -38,7 +38,7 @@ jobs:
               "cachedir: ${HOME}/bst-cache" \
               "sourcedir: ${HOME}/bst-cache/sources" \
               "build:" \
-              "  max-jobs: 8" \
+              "  max-jobs: 4" \
               "scheduler:" \
               "  builders: 2" \
               "cache:" \
