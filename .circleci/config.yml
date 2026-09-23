@@ -1,7 +1,42 @@
 version: 2.1
 
+anchors:
+  install-deps: &install-deps
+    run:
+      name: Install Dependencies
+      command: |
+        sudo apt-get update
+        sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y python3-pip python3-venv bubblewrap git tar zstd curl lzip
+        python3 -m venv .venv
+        .venv/bin/pip install --upgrade pip
+        .venv/bin/pip install "buildstream==2.8.0" "dulwich<0.22.0" requests
+
+  oras-login: &oras-login
+    run:
+      name: Install ORAS and log in to GHCR
+      command: |
+        : "${GHCR_USER:?set GHCR_USER in CircleCI project env vars}"
+        : "${GHCR_TOKEN:?set GHCR_TOKEN in CircleCI project env vars}"
+        curl -fsSL -o oras.tar.gz https://github.com/oras-project/oras/releases/download/v1.2.0/oras_1.2.0_linux_amd64.tar.gz
+        mkdir -p oras-install
+        tar -zxf oras.tar.gz -C oras-install
+        sudo mv oras-install/oras /usr/local/bin/
+        echo "$GHCR_TOKEN" | oras login ghcr.io -u "$GHCR_USER" --password-stdin
+        if [ -z "${CACHE_TAG:-}" ]; then
+          printf 'export CACHE_TAG=%s\n' "$(printf '%s' "$CIRCLE_BRANCH" | tr -c 'a-zA-Z0-9._-' '-')" >> "$BASH_ENV"
+        fi
+
+  restore-base: &restore-base
+    run:
+      name: Restore base (toolchain) cache
+      no_output_timeout: 30m
+      command: |
+        ./scripts/bst-cache.sh restore sources
+        ./scripts/bst-cache.sh restore cas
+        ./scripts/bst-cache.sh restore artifacts
+
 jobs:
-  build-os:
+  build-toolchain:
     machine:
       image: ubuntu-2204:current
     resource_class: large
@@ -11,7 +46,6 @@ jobs:
       BST_BUILD_MINUTES: "35"
     steps:
       - checkout
-
       - run:
           name: Create Emergency Swap Space
           command: |
@@ -20,16 +54,7 @@ jobs:
             sudo mkswap /swapfile
             sudo swapon /swapfile
             sudo sysctl vm.swappiness=10
-
-      - run:
-          name: Install Dependencies
-          command: |
-            sudo apt-get update
-            sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y python3-pip python3-venv bubblewrap git tar zstd curl lzip
-            python3 -m venv .venv
-            .venv/bin/pip install --upgrade pip
-            .venv/bin/pip install "buildstream==2.8.0" "dulwich<0.22.0" requests
-
+      - *install-deps
       - run:
           name: Configure BuildStream (Throttled for RAM)
           command: |
@@ -46,34 +71,14 @@ jobs:
               "  pull-buildtrees: False" \
               "  cache-buildtrees: never" \
               > ~/.config/buildstream.conf
-
+      - *oras-login
+      - *restore-base
       - run:
-          name: Install ORAS and log in to GHCR
-          command: |
-            : "${GHCR_USER:?set GHCR_USER in CircleCI project env vars}"
-            : "${GHCR_TOKEN:?set GHCR_TOKEN in CircleCI project env vars}"
-            curl -fsSL -o oras.tar.gz https://github.com/oras-project/oras/releases/download/v1.2.0/oras_1.2.0_linux_amd64.tar.gz
-            mkdir -p oras-install
-            tar -zxf oras.tar.gz -C oras-install
-            sudo mv oras-install/oras /usr/local/bin/
-            echo "$GHCR_TOKEN" | oras login ghcr.io -u "$GHCR_USER" --password-stdin
-            printf 'export CACHE_TAG=%s\n' "$(printf '%s' "$CIRCLE_BRANCH" | tr -c 'a-zA-Z0-9._-' '-')" >> "$BASH_ENV"
-
-      - run:
-          name: Restore BuildStream caches
-          no_output_timeout: 30m
-          command: |
-            ./scripts/bst-cache.sh restore sources
-            ./scripts/bst-cache.sh restore cas
-            ./scripts/bst-cache.sh restore artifacts
-
-      - run:
-          name: Build flucidOS
+          name: Build toolchain (SDK bootstrap + cross + target toolchain)
           no_output_timeout: 60m
           command: |
-            .venv/bin/bst source track adjusted.bst
-            timeout -k 120 "${BST_BUILD_MINUTES}m" bash -c '.venv/bin/bst build adjusted.bst && .venv/bin/bst build tools/test.bst'
-
+            .venv/bin/bst source track tools/toolchain.bst
+            timeout -k 120 "${BST_BUILD_MINUTES}m" .venv/bin/bst build tools/toolchain.bst
       - run:
           name: Save BuildStream caches
           when: always
@@ -84,12 +89,118 @@ jobs:
             ./scripts/bst-cache.sh save cas
             ./scripts/bst-cache.sh save artifacts
 
+  build-pkgs:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large
+    parameters:
+      group_tag:
+        type: string
+      targets:
+        type: string
+    environment:
+      GHCR_CACHE_REPO: ghcr.io/flucidos/flucidos-system-bootstrap/bst-cache
+      FALLBACK_TAG: main
+      BST_BUILD_MINUTES: "35"
+      CACHE_TAG: << parameters.group_tag >>
+    steps:
+      - checkout
       - run:
-          name: Checkout Artifacts
+          name: Create Emergency Swap Space
           command: |
+            sudo fallocate -l 10G /swapfile
+            sudo chmod 600 /swapfile
+            sudo mkswap /swapfile
+            sudo swapon /swapfile
+            sudo sysctl vm.swappiness=10
+      - *install-deps
+      - run:
+          name: Configure BuildStream (many small independent packages)
+          command: |
+            mkdir -p ~/.config
+            printf '%s\n' \
+              "cachedir: ${HOME}/bst-cache" \
+              "sourcedir: ${HOME}/bst-cache/sources" \
+              "build:" \
+              "  max-jobs: 1" \
+              "scheduler:" \
+              "  builders: 4" \
+              "cache:" \
+              "  quota: infinity" \
+              "  pull-buildtrees: False" \
+              "  cache-buildtrees: never" \
+              > ~/.config/buildstream.conf
+      - *oras-login
+      - *restore-base
+      - run:
+          name: Build package group
+          no_output_timeout: 60m
+          command: |
+            .venv/bin/bst source track << parameters.targets >>
+            timeout -k 120 "${BST_BUILD_MINUTES}m" .venv/bin/bst build << parameters.targets >>
+      - run:
+          name: Save BuildStream caches
+          when: always
+          no_output_timeout: 30m
+          command: |
+            sleep 5
+            ./scripts/bst-cache.sh save sources
+            ./scripts/bst-cache.sh save cas
+            ./scripts/bst-cache.sh save artifacts
+
+  compose-os:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: medium
+    environment:
+      GHCR_CACHE_REPO: ghcr.io/flucidos/flucidos-system-bootstrap/bst-cache
+      FALLBACK_TAG: main
+    steps:
+      - checkout
+      - *install-deps
+      - run:
+          name: Configure BuildStream
+          command: |
+            mkdir -p ~/.config
+            printf '%s\n' \
+              "cachedir: ${HOME}/bst-cache" \
+              "sourcedir: ${HOME}/bst-cache/sources" \
+              "build:" \
+              "  max-jobs: 2" \
+              "scheduler:" \
+              "  builders: 2" \
+              "cache:" \
+              "  quota: infinity" \
+              "  pull-buildtrees: False" \
+              "  cache-buildtrees: never" \
+              > ~/.config/buildstream.conf
+      - *oras-login
+      - run:
+          name: Restore and merge all caches (base + every package group)
+          no_output_timeout: 30m
+          command: |
+            for tag in main pkgs-group-a pkgs-group-b pkgs-group-c pkgs-group-d; do
+              CACHE_TAG="$tag" ./scripts/bst-cache.sh restore sources
+              CACHE_TAG="$tag" ./scripts/bst-cache.sh restore cas
+              CACHE_TAG="$tag" ./scripts/bst-cache.sh restore artifacts
+            done
+      - run:
+          name: Guard - fail loudly if anything is not already cached
+          command: |
+            missing="$(.venv/bin/bst show --deps all -f '%{state} %{name}' adjusted.bst tools/test.bst 2>/dev/null | grep -v '^cached' || true)"
+            if [ -n "$missing" ]; then
+              echo "Not everything is cached yet -- Builder hasn't finished:"
+              echo "$missing"
+              exit 1
+            fi
+            echo "Everything cached. Composing."
+      - run:
+          name: Compose flucidOS
+          command: |
+            .venv/bin/bst build adjusted.bst
+            .venv/bin/bst build tools/test.bst
             rm -rf result
             .venv/bin/bst --no-strict artifact checkout -d none --no-integrate adjusted.bst --directory result/
-
       - store_artifacts:
           path: result/
           destination: flucidOS-bootstrap-result
@@ -98,7 +209,52 @@ workflows:
   version: 2
   build-workflow:
     jobs:
-      - build-os:
+      - build-toolchain:
+          filters:
+            branches:
+              only: main
+      - build-pkgs:
+          name: build-pkgs-a
+          group_tag: pkgs-group-a
+          targets: "pkgs/ncurses.bst pkgs/gettext.bst pkgs/bash.bst pkgs/python.bst pkgs/perl.bst pkgs/coreutils.bst"
+          requires:
+            - build-toolchain
+          filters:
+            branches:
+              only: main
+      - build-pkgs:
+          name: build-pkgs-b
+          group_tag: pkgs-group-b
+          targets: "pkgs/m4.bst pkgs/make.bst pkgs/bison.bst pkgs/flex.bst pkgs/autoconf.bst pkgs/autoconf-archive.bst"
+          requires:
+            - build-toolchain
+          filters:
+            branches:
+              only: main
+      - build-pkgs:
+          name: build-pkgs-c
+          group_tag: pkgs-group-c
+          targets: "pkgs/automake.bst pkgs/libtool.bst pkgs/pkg-config.bst pkgs/debugedit.bst pkgs/gawk.bst pkgs/diffutils.bst"
+          requires:
+            - build-toolchain
+          filters:
+            branches:
+              only: main
+      - build-pkgs:
+          name: build-pkgs-d
+          group_tag: pkgs-group-d
+          targets: "pkgs/file.bst pkgs/findutils.bst pkgs/grep.bst pkgs/sed.bst pkgs/gzip.bst pkgs/tar.bst"
+          requires:
+            - build-toolchain
+          filters:
+            branches:
+              only: main
+      - compose-os:
+          requires:
+            - build-pkgs-a
+            - build-pkgs-b
+            - build-pkgs-c
+            - build-pkgs-d
           filters:
             branches:
               only: main
